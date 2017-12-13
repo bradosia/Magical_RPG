@@ -1,14 +1,13 @@
-/*
- Branden Lee, Anh Truong, Alexander Morfin, and Michael Wu
- CIS 22C
- Fall 2017
- Final Project
-
- Used Microsoft Visual Studio 2017
- Windows SDK Version: 10.0.16299.0
- Use SDK Version: 10.0.15063.0 for De Anza Computers
- USE DOXYGEN COMPLIANT DOCUMENTATION
- */
+//============================================================================
+// Name        : Ravioli Racing
+// Author      : Branden Lee
+// Version     : 0.01
+// Copyright   : GPL
+// Description : C++ Racing Game
+//
+// IDE: Eclipse Version: Neon.2 Release (4.6.2)
+// Requires Cygwin in windows and GCC in linux
+//============================================================================
 #include "POSIX_HTTP.h"
 
 int POSIX_HTTP::socket_connect(char *host, in_port_t port)
@@ -19,8 +18,7 @@ int POSIX_HTTP::socket_connect(char *host, in_port_t port)
 
 	if ((hp = gethostbyname(host)) == NULL)
 	{
-		std::cout << "gethostbyname";
-		//exit(1);
+		throw std::runtime_error("gethostbyname");
 	}
 	bcopy(hp->h_addr, &addr.sin_addr, hp->h_length);
 	addr.sin_port = htons(port);
@@ -30,15 +28,13 @@ int POSIX_HTTP::socket_connect(char *host, in_port_t port)
 
 	if (sock == -1)
 	{
-		std::cout << "setsockopt";
-		//exit(1);
+		throw std::runtime_error("setsockopt");
 	}
 
 	if (connect(sock, (struct sockaddr *) &addr, sizeof(struct sockaddr_in))
 			== -1)
 	{
-		std::cout << "connect";
-		//exit(1);
+		throw std::runtime_error("connect");
 
 	}
 	return sock;
@@ -50,17 +46,22 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 	char buffer[BUFFER_SIZE];
 	std::string response, get_http;
 	response = "";
-	get_http = "GET " + path + " HTTP/1.1"
-			+ "\r\nHost: " + url
-			+ "\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
-			+ "\r\nAccept-Language: en-us"
-			+ "\r\nConnection: close\r\n\r\n";
+	get_http =
+			"GET " + path + " HTTP/1.1" + "\r\nHost: " + url
+					+ "\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+					+ "\r\nAccept-Language: en-us"
+					+ "\r\nConnection: close\r\n\r\n";
 	char *cstr = new char[url.length() + 1];
 	char *getHttpC = new char[get_http.length() + 1];
 	strcpy(cstr, url.c_str());
 	strcpy(getHttpC, get_http.c_str());
-
-	fd = socket_connect(cstr, 80);
+	try
+	{
+		fd = socket_connect(cstr, 80);
+	} catch (const std::exception& e)
+	{
+		throw std::runtime_error(e.what());
+	}
 	write(fd, getHttpC, strlen(getHttpC)); // write(fd, char[]*, len);
 	bzero(buffer, BUFFER_SIZE);
 
