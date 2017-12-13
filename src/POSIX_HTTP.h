@@ -17,12 +17,11 @@ USE DOXYGEN COMPLIANT DOCUMENTATION
 #include <iostream>
 #include <locale>
 #include <stdio.h>
-#ifdef __CYGWIN__
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 #include <netdb.h>  /* Needed for getaddrinfo() and freeaddrinfo() */
 #include <unistd.h> /* Needed for close() */
-#endif
 
 #define BUFFER_SIZE 1024
 
