@@ -32,7 +32,6 @@ bool cScene::LoadLevel(int level,int tex_w, int tex_h)
 
 	if(level<10) sprintf(file,"Levels/%s0%d%s",(char *)LEVEL_FILENAME,level,(char *)FILENAME_EXT);
 	else		 sprintf(file,"Levels/%s%d%s",(char *)LEVEL_FILENAME,level,(char *)FILENAME_EXT);
-
 	fd=fopen(file,"r");
 	if(fd==NULL) return false;
 
@@ -192,7 +191,6 @@ bool cScene::LoadLevel(int level,int tex_w, int tex_h)
 
 		glEnd();
 	glEndList();
-
 	id_AlwaysDown=glGenLists(1);
 	glNewList(id_AlwaysDown,GL_COMPILE);
 		glBegin(GL_QUADS);

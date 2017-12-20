@@ -16,20 +16,23 @@
 #include <locale>
 #include <string>
 #include <stdio.h>
+#include <fstream>
+#include <stdexcept>     // std::runtime_error
+#include <functional>
+#include <string.h>
+#ifdef __linux__
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>      // close()
-#include <string.h>
 #include <netdb.h>       // getaddrinfo() and freeaddrinfo()
 #include <sys/uio.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <fstream>
-#include <stdexcept>     // std::runtime_error
+#endif
 
 #define BUFFER_SIZE 1024
 
@@ -46,7 +49,7 @@ A collection of HTTP methods.
 class POSIX_HTTP
 {
 public:
-	static int socket_connect(char *host, in_port_t port);
+	static int socket_connect(char *host, int port);
 	static std::string getWebsite(std::string url, std::string path);
 	static std::string html (std::string response);
 };

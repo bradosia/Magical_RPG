@@ -26,20 +26,24 @@ public:
 	void Activate();
 	void Deactivate();
 
-	template <class T>
-	void SetUniform(char* uniform, T value) //el acceso a uniforms se hace siempre despues de linkar (metodo Activate())
+	template<class T>
+	void SetUniform(std::string uniform, T value) //el acceso a uniforms se hace siempre despues de linkar (metodo Activate())
 	{
-		GLint loc = glGetUniformLocation(prog, uniform);
+		char *cstr = new char[uniform.length() + 1];
+		strcpy(cstr, uniform.c_str());
+		GLint loc = glGetUniformLocation(prog, cstr);
 		if (loc != -1)
 		{
-			if(typeid(T) == typeid(int)) glUniform1i(loc, value);
-			else glUniform1f(loc, value);
+			if (typeid(T) == typeid(int))
+				glUniform1i(loc, value);
+			else
+				glUniform1f(loc, value);
 		}
 	}
 
 private:
-	GLuint   prog;
-	GLuint   shaders[NUM_SHADERS];
+	GLuint prog;
+	GLuint shaders[NUM_SHADERS];
 };
 
 #endif

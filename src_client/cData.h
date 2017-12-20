@@ -25,11 +25,11 @@ public:
 	cData(void);
 	~cData(void);
 
-	int  GetID(int img);
+	int GetID(int img);
 	void GetSize(int img, int *w, int *h);
 	bool Load();
 
 private:
 	cTexture textures[NUM_TEX];
-	bool LoadImage(int img,char *filename,int type = GL_RGBA);
+	bool LoadImage(int img, std::string filename, int type = GL_RGBA);
 };

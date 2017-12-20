@@ -13,11 +13,14 @@ void cData::GetSize(int img, int *w, int *h)
 	textures[img].GetSize(w,h);
 }
 
-bool cData::LoadImage(int img, char *filename, int type)
+bool cData::LoadImage(int img, std::string filename, int type)
 {
 	int res;
 
-	res = textures[img].Load(filename,type);
+	char *cstr = new char[filename.length() + 1];
+	strcpy(cstr, filename.c_str());
+
+	res = textures[img].Load(cstr,type);
 	if(!res) return false;
 
 	return true;

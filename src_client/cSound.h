@@ -1,7 +1,9 @@
 #ifndef C_SOUND_H
 #define C_SOUND_H
 
-#include "fmod.hpp" //fmod c++ header
+#include "AudioLibBass.h"
+
+#define AudioLib AudioLibBass
 
 //Sound array size
 #define NUM_SOUNDS 15
@@ -37,11 +39,10 @@ public:
 	void StopAll();
 	void Update();
 
-	FMOD::System*     system; //handle to FMOD engine
-    FMOD::Sound*      sounds[NUM_SOUNDS]; //sound that will be loaded and played
-	FMOD::Channel*    ambient1Channel;
-	FMOD::Channel*    ambient2Channel;
-	FMOD::DSP*        dspSmoothStop;
+	AudioLib::AudioDevice *devicePtr;
+	AudioLib::OutputStream *soundsPtr[NUM_SOUNDS];
+	AudioLib::OutputStream *ambient1ChannelPtr;
+	AudioLib::OutputStream *ambient2ChannelPtr;
 };
 
 #endif

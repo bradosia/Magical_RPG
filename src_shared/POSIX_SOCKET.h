@@ -16,41 +16,45 @@
 #include <locale>
 #include <string>
 #include <stdio.h>
+#include <fstream>
+#include <stdexcept>     // std::runtime_error
+#include <functional>
+#include <string.h>
+#ifdef __linux__
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>      // close()
-#include <string.h>
 #include <netdb.h>       // getaddrinfo() and freeaddrinfo()
 #include <sys/uio.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <fstream>
-#include <stdexcept>     // std::runtime_error
-#include <functional>
+#endif
 
 #define BUFFER_SIZE 1024
 
 /**
-@class WinHTTP
-Uses libraries for a basic winsock application.
-A collection of HTTP methods.
-*/
+ @class WinHTTP
+ Uses libraries for a basic winsock application.
+ A collection of HTTP methods.
+ */
 class POSIX_SOCKET
 {
 private:
+#ifdef __linux__
 	sockaddr_in servAddr;
 	int serverSd;
 	int acceptSd;
 	bool listenFlag;
 	std::string host;
 	in_port_t port;
+#endif
 public:
-	POSIX_SOCKET(in_port_t port_);
-	POSIX_SOCKET(std::string host_, in_port_t port_);
+	POSIX_SOCKET(int port);
+	POSIX_SOCKET(std::string host_, int port);
 	void sockSetup();
 	void sockConnect();
 	void sockBind();

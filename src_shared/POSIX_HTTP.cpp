@@ -10,11 +10,13 @@
 //============================================================================
 #include "POSIX_HTTP.h"
 
-int POSIX_HTTP::socket_connect(char *host, in_port_t port)
+int POSIX_HTTP::socket_connect(char *host, int port_)
 {
+	int on = 1, sock;
+#ifdef __linux__
+	in_port_t port = (in_port_t) port_;
 	struct hostent *hp;
 	struct sockaddr_in addr;
-	int on = 1, sock;
 
 	if ((hp = gethostbyname(host)) == NULL)
 	{
@@ -37,6 +39,7 @@ int POSIX_HTTP::socket_connect(char *host, in_port_t port)
 		throw std::runtime_error("connect");
 
 	}
+#endif
 	return sock;
 }
 
@@ -46,11 +49,12 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 	char buffer[BUFFER_SIZE];
 	std::string response, get_http;
 	response = "";
+#ifdef __linux__
 	get_http =
-			"GET " + path + " HTTP/1.1" + "\r\nHost: " + url
-					+ "\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
-					+ "\r\nAccept-Language: en-us"
-					+ "\r\nConnection: close\r\n\r\n";
+	"GET " + path + " HTTP/1.1" + "\r\nHost: " + url
+	+ "\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+	+ "\r\nAccept-Language: en-us"
+	+ "\r\nConnection: close\r\n\r\n";
 	char *cstr = new char[url.length() + 1];
 	char *getHttpC = new char[get_http.length() + 1];
 	strcpy(cstr, url.c_str());
@@ -58,7 +62,8 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 	try
 	{
 		fd = socket_connect(cstr, 80);
-	} catch (const std::exception& e)
+	}
+	catch (const std::exception& e)
 	{
 		throw std::runtime_error(e.what());
 	}
@@ -73,7 +78,7 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 
 	shutdown(fd, SHUT_RDWR);
 	close(fd);
-
+#endif
 	return response;
 }
 

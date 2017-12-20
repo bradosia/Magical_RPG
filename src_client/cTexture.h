@@ -2,7 +2,7 @@
 #define C_TEXTURE_H
 
 #include "Globals.h"
-#include "corona.h"
+#include "include/corona.h"
 
 class cTexture
 {
