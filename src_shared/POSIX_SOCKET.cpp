@@ -9,10 +9,10 @@
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
 #include "POSIX_SOCKET.h"
+#ifdef __linux__
 
 POSIX_SOCKET::POSIX_SOCKET(int port_)
 {
-#ifdef __linux__
 	port = (in_port_t)port_;
 	//setup a socket and connection tools
 	memset((char*) &servAddr, 0, sizeof(servAddr));
@@ -20,12 +20,10 @@ POSIX_SOCKET::POSIX_SOCKET(int port_)
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servAddr.sin_port = htons(port);
 	listenFlag = false;
-#endif
 }
 
 POSIX_SOCKET::POSIX_SOCKET(std::string host_, int port_)
 {
-#ifdef __linux__
 	port = (in_port_t)port_;
 	host = host_;
 	char* hostC = new char[host.length() + 1];
@@ -38,12 +36,10 @@ POSIX_SOCKET::POSIX_SOCKET(std::string host_, int port_)
 			inet_ntoa(*(struct in_addr*) *host->h_addr_list));
 	servAddr.sin_port = htons(port);
 	listenFlag = false;
-#endif
 }
 
 void POSIX_SOCKET::sockSetup()
 {
-#ifdef __linux__
 	//open stream oriented socket with internet address
 	//also keep track of the socket descriptor
 	serverSd = socket(AF_INET, SOCK_STREAM, 0);
@@ -51,24 +47,20 @@ void POSIX_SOCKET::sockSetup()
 	{
 		throw std::runtime_error("Error establishing the server socket");
 	}
-#endif
 }
 
 void POSIX_SOCKET::sockConnect()
 {
-#ifdef __linux__
 	//try to connect...
 	int status = connect(serverSd, (sockaddr*) &servAddr, sizeof(servAddr));
 	if (status < 0)
 	{
 		throw std::runtime_error("Error connecting to socket!");
 	}
-#endif
 }
 
 void POSIX_SOCKET::sockBind()
 {
-#ifdef __linux__
 	//bind the socket to its local address
 	int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr,
 			sizeof(servAddr));
@@ -76,12 +68,10 @@ void POSIX_SOCKET::sockBind()
 	{
 		throw std::runtime_error("Error binding socket to local address");
 	}
-#endif
 }
 
 void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
 {
-#ifdef __linux__
 	//listen for up to 5 requests at a time
 	listen(serverSd, 5);
 	//receive a request from client using accept
@@ -106,7 +96,7 @@ void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
 	{
 		//receive a message from the client (listen)
 		std::cout << "Awaiting client response..." << std::endl;
-		memset(&msg, 0, sizeof(msg));	//clear the buffer
+		memset(&msg, 0, sizeof(msg));//clear the buffer
 		bytesRead += recv(acceptSd, (char*) &msg, sizeof(msg), 0);
 		if (!strcmp(msg, "exit"))
 		{
@@ -135,16 +125,14 @@ void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
 	close(serverSd);
 	std::cout << "********Session********" << std::endl;
 	std::cout << "Bytes written: " << bytesWritten << " Bytes read: "
-			<< bytesRead << std::endl;
+	<< bytesRead << std::endl;
 	std::cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) << " secs"
-			<< std::endl;
+	<< std::endl;
 	std::cout << "Connection closed..." << std::endl;
-#endif
 }
 
 void POSIX_SOCKET::sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB)
 {
-#ifdef __linux__
 	int bytesRead, bytesWritten = 0;
 	struct timeval start1, end1;
 	gettimeofday(&start1, NULL);
@@ -177,9 +165,9 @@ void POSIX_SOCKET::sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB)
 	close (serverSd);
 	std::cout << "********Session********" << std::endl;
 	std::cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead
-			<< std::endl;
+	<< std::endl;
 	std::cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) << " secs"
-			<< std::endl;
+	<< std::endl;
 	std::cout << "Connection closed" << std::endl;
-#endif
 }
+#endif

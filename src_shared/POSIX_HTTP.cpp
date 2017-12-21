@@ -9,11 +9,11 @@
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
 #include "POSIX_HTTP.h"
+#ifdef __linux__
 
 int POSIX_HTTP::socket_connect(char *host, int port_)
 {
 	int on = 1, sock;
-#ifdef __linux__
 	in_port_t port = (in_port_t) port_;
 	struct hostent *hp;
 	struct sockaddr_in addr;
@@ -39,7 +39,6 @@ int POSIX_HTTP::socket_connect(char *host, int port_)
 		throw std::runtime_error("connect");
 
 	}
-#endif
 	return sock;
 }
 
@@ -49,7 +48,6 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 	char buffer[BUFFER_SIZE];
 	std::string response, get_http;
 	response = "";
-#ifdef __linux__
 	get_http =
 	"GET " + path + " HTTP/1.1" + "\r\nHost: " + url
 	+ "\r\nUser-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
@@ -78,7 +76,6 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 
 	shutdown(fd, SHUT_RDWR);
 	close(fd);
-#endif
 	return response;
 }
 
@@ -86,3 +83,4 @@ std::string POSIX_HTTP::html(std::string response)
 {
 	return response.substr(response.find("\r\n\r\n") + 4);
 }
+#endif

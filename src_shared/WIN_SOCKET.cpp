@@ -8,42 +8,93 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "POSIX_SOCKET.h"
+#include "WIN_SOCKET.h"
+#ifdef _WIN32
 
-POSIX_SOCKET::POSIX_SOCKET(int port_)
+WIN_SOCKET::WIN_SOCKET(int port_)
 {
-#ifdef __linux__
-	port = (in_port_t)port_;
+	port = (u_short) port_;
 	//setup a socket and connection tools
 	memset((char*) &servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servAddr.sin_port = htons(port);
 	listenFlag = false;
-#endif
 }
 
-POSIX_SOCKET::POSIX_SOCKET(std::string host_, int port_)
+WIN_SOCKET::WIN_SOCKET(std::string host_, int port_)
 {
-#ifdef __linux__
-	port = (in_port_t)port_;
+	port = (u_short) port_;
 	host = host_;
 	char* hostC = new char[host.length() + 1];
 	strcpy(hostC, host.c_str());
-	struct hostent* host = gethostbyname(hostC);
+
+	/* get IP by host */
+	char hostname[NI_MAXHOST];
+	char servInfo[NI_MAXSERV];
+	std::string errMsg;
+	struct addrinfo hints, *res;
+	struct in_addr addr;
+	int err;
+
+	WSAData data;
+	WSAStartup(MAKEWORD(2, 0), &data);
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = AF_INET;
+
+	if ((err = getaddrinfo(host_.c_str(), NULL, &hints, &res)) != 0)
+	{
+		errMsg = "";
+		if (err == 11001)
+		{
+			errMsg = "Host not found";
+		}
+		/*throw std::runtime_error(
+				"Error Code " + std::to_string(err)
+						+ (errMsg.length() > 0 ? ": " + errMsg : ""));*/
+	}
+
+	try
+	{
+		addr.S_un = ((struct sockaddr_in *) (res->ai_addr))->sin_addr.S_un;
+	} catch (const std::exception& e)
+	{
+		throw std::runtime_error(
+				"Could not connect to the internet." + std::string(e.what()));
+	}
+	freeaddrinfo(res);
+	WSACleanup();
+
 	//setup a socket and connection tools
 	memset((char*) &servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
-	servAddr.sin_addr.s_addr = inet_addr(
-			inet_ntoa(*(struct in_addr*) *host->h_addr_list));
+	servAddr.sin_addr.s_addr = *((unsigned long*) &(addr.S_un));
 	servAddr.sin_port = htons(port);
 	listenFlag = false;
-#endif
+
+	/* get ip address string */
+	DWORD dwRetval;
+	dwRetval = getnameinfo((struct sockaddr *) &servAddr,
+			sizeof(struct sockaddr), hostname,
+			NI_MAXHOST, servInfo, NI_MAXSERV, NI_NUMERICSERV);
+
+	if (dwRetval == 0)
+	{
+		std::cout << "ip address: " << hostname << std::endl;
+	}
 }
 
-void POSIX_SOCKET::sockSetup()
+void WIN_SOCKET::sockSetup()
 {
-#ifdef __linux__
+	WSADATA wsaData;
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	{
+		throw std::runtime_error("WSAStartup failed.");
+		//return 1;
+	}
+
 	//open stream oriented socket with internet address
 	//also keep track of the socket descriptor
 	serverSd = socket(AF_INET, SOCK_STREAM, 0);
@@ -51,24 +102,20 @@ void POSIX_SOCKET::sockSetup()
 	{
 		throw std::runtime_error("Error establishing the server socket");
 	}
-#endif
 }
 
-void POSIX_SOCKET::sockConnect()
+void WIN_SOCKET::sockConnect()
 {
-#ifdef __linux__
 	//try to connect...
 	int status = connect(serverSd, (sockaddr*) &servAddr, sizeof(servAddr));
-	if (status < 0)
+	if (status != 0)
 	{
 		throw std::runtime_error("Error connecting to socket!");
 	}
-#endif
 }
 
-void POSIX_SOCKET::sockBind()
+void WIN_SOCKET::sockBind()
 {
-#ifdef __linux__
 	//bind the socket to its local address
 	int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr,
 			sizeof(servAddr));
@@ -76,12 +123,10 @@ void POSIX_SOCKET::sockBind()
 	{
 		throw std::runtime_error("Error binding socket to local address");
 	}
-#endif
 }
 
-void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
+void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 {
-#ifdef __linux__
 	//listen for up to 5 requests at a time
 	listen(serverSd, 5);
 	//receive a request from client using accept
@@ -97,8 +142,9 @@ void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
 	}
 	listenFlag = true;
 	//lets keep track of the session time
-	struct timeval start1, end1;
-	gettimeofday(&start1, NULL);
+	//std::chrono::system_clock::time_point t1, t2;
+	unsigned int elapsedTime = 0;
+	//t1 = std::chrono::system_clock::now();
 	//also keep track of the amount of data sent as well
 	int bytesRead, bytesWritten = 0;
 	char msg[1500];
@@ -130,24 +176,24 @@ void POSIX_SOCKET::sockListen(std::function<void(POSIX_SOCKET*)>* listenCB)
 		(*listenCB)(this);
 	}
 	//we need to close the socket descriptors after we're all done
-	gettimeofday(&end1, NULL);
-	close(acceptSd);
-	close(serverSd);
+	/*t2 = std::chrono::system_clock::now();
+	 elapsedTime = (int) std::chrono::duration_cast < std::chrono::seconds
+	 > (t2 - t1).count();*/
+	closesocket(acceptSd);
+	closesocket(serverSd);
 	std::cout << "********Session********" << std::endl;
 	std::cout << "Bytes written: " << bytesWritten << " Bytes read: "
 			<< bytesRead << std::endl;
-	std::cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) << " secs"
-			<< std::endl;
+	std::cout << "Elapsed time: " << elapsedTime << " secs" << std::endl;
 	std::cout << "Connection closed..." << std::endl;
-#endif
 }
 
-void POSIX_SOCKET::sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB)
+void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 {
-#ifdef __linux__
 	int bytesRead, bytesWritten = 0;
-	struct timeval start1, end1;
-	gettimeofday(&start1, NULL);
+	//std::chrono::system_clock::time_point t1, t2;
+	unsigned int elapsedTime = 0;
+	//t1 = std::chrono::system_clock::now();
 	char msg[1500];
 	while (1)
 	{
@@ -173,13 +219,15 @@ void POSIX_SOCKET::sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB)
 		std::cout << "Server: " << msg << std::endl;
 		(*listenCB)(this);
 	}
-	gettimeofday(&end1, NULL);
-	close (serverSd);
+	/*t2 = std::chrono::system_clock::now();
+	 elapsedTime = (int) std::chrono::duration_cast < std::chrono::seconds
+	 > (t2 - t1).count();*/
+	closesocket(serverSd);
 	std::cout << "********Session********" << std::endl;
-	std::cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead
-			<< std::endl;
-	std::cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) << " secs"
-			<< std::endl;
+	std::cout << "Bytes written: " << bytesWritten << " Bytes read: "
+			<< bytesRead << std::endl;
+	std::cout << "Elapsed time: " << elapsedTime << " secs" << std::endl;
 	std::cout << "Connection closed" << std::endl;
-#endif
 }
+
+#endif

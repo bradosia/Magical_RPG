@@ -8,8 +8,8 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#ifndef POSIX_SOCKET_H
-#define POSIX_SOCKET_H
+#ifndef U_SOCKET_H
+#define U_SOCKET_H
 
 #include <cstring>       // strlen
 #include <iostream>
@@ -20,46 +20,35 @@
 #include <stdexcept>     // std::runtime_error
 #include <functional>
 #include <string.h>
+
 #ifdef __linux__
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>      // close()
-#include <netdb.h>       // getaddrinfo() and freeaddrinfo()
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <fcntl.h>
+#include "POSIX_SOCKET.h"
+#define UU_SOCKET POSIX_SOCKET
+#elif _WIN32
+#include "WIN_SOCKET.h"
+#define UU_SOCKET WIN_SOCKET
 #endif
 
 #define BUFFER_SIZE 1024
 
 /**
- @class WinHTTP
+ @class U_SOCKET
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class POSIX_SOCKET
+class U_SOCKET
 {
 private:
-#ifdef __linux__
-	sockaddr_in servAddr;
-	int serverSd;
-	int acceptSd;
-	bool listenFlag;
-	std::string host;
-	in_port_t port;
-#endif
+	UU_SOCKET *sockObjPtr;
 public:
-	POSIX_SOCKET(int port);
-	POSIX_SOCKET(std::string host_, int port);
+	U_SOCKET(int port);
+	U_SOCKET(std::string host_, int port);
+	U_SOCKET(UU_SOCKET *sock_);
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
-	void sockListen(std::function<void(POSIX_SOCKET*)>* listenCB);
-	void sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB);
+	void sockListen(std::function<void(U_SOCKET*)>* listenCB);
+	void sockLoop(std::function<void(U_SOCKET*)>* listenCB);
 };
 
 #endif

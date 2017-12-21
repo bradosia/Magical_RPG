@@ -10,6 +10,7 @@
 //============================================================================
 #ifndef POSIX_SOCKET_H
 #define POSIX_SOCKET_H
+#ifdef __linux__
 
 #include <cstring>       // strlen
 #include <iostream>
@@ -20,7 +21,6 @@
 #include <stdexcept>     // std::runtime_error
 #include <functional>
 #include <string.h>
-#ifdef __linux__
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -32,7 +32,6 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#endif
 
 #define BUFFER_SIZE 1024
 
@@ -62,4 +61,5 @@ public:
 	void sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB);
 };
 
+#endif
 #endif

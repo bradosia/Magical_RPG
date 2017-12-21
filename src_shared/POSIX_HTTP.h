@@ -10,7 +10,7 @@
 //============================================================================
 #ifndef POSIX_HTTP_H
 #define POSIX_HTTP_H
-
+#ifdef __linux__
 #include <cstring>       // strlen
 #include <iostream>
 #include <locale>
@@ -20,7 +20,6 @@
 #include <stdexcept>     // std::runtime_error
 #include <functional>
 #include <string.h>
-#ifdef __linux__
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -32,7 +31,6 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#endif
 
 #define BUFFER_SIZE 1024
 
@@ -53,5 +51,5 @@ public:
 	static std::string getWebsite(std::string url, std::string path);
 	static std::string html (std::string response);
 };
-
+#endif
 #endif

@@ -8,8 +8,10 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#ifndef POSIX_SOCKET_H
-#define POSIX_SOCKET_H
+#ifndef WIN_SOCKET_H
+#define WIN_SOCKET_H
+#ifdef _WIN32
+#define __USE_MINGW_ANSI_STDIO 0 // clears error: multiple definition of `vsnprintf'
 
 #include <cstring>       // strlen
 #include <iostream>
@@ -19,20 +21,13 @@
 #include <fstream>
 #include <stdexcept>     // std::runtime_error
 #include <functional>
-#include <string.h>
-#ifdef __linux__
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>      // close()
-#include <netdb.h>       // getaddrinfo() and freeaddrinfo()
-#include <sys/uio.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#endif
+#include <chrono>
+
+/* windows sock */
+#define _WIN32_WINNT 0x6000 // getaddrinfo and freeaddrinfo
+#include <winsock2.h>
+#include <ws2tcpip.h> // getaddrinfo
+
 
 #define BUFFER_SIZE 1024
 
@@ -41,25 +36,25 @@
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class POSIX_SOCKET
+class WIN_SOCKET
 {
 private:
-#ifdef __linux__
 	sockaddr_in servAddr;
 	int serverSd;
 	int acceptSd;
 	bool listenFlag;
 	std::string host;
-	in_port_t port;
-#endif
+	u_short port;
+
 public:
-	POSIX_SOCKET(int port);
-	POSIX_SOCKET(std::string host_, int port);
+	WIN_SOCKET(int port);
+	WIN_SOCKET(std::string host_, int port);
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
-	void sockListen(std::function<void(POSIX_SOCKET*)>* listenCB);
-	void sockLoop(std::function<void(POSIX_SOCKET*)>* listenCB);
+	void sockListen(std::function<void(WIN_SOCKET*)>* listenCB);
+	void sockLoop(std::function<void(WIN_SOCKET*)>* listenCB);
 };
 
+#endif
 #endif
