@@ -210,7 +210,7 @@ void cGame::ReadKeyboard(unsigned char key, int x, int y, bool press)
 {
 	if (key >= 'A' && key <= 'Z')
 		key += 32;
-	std::cout << "key: " << key << std::endl;
+	// std::cout << "key: " << key << std::endl;
 	// first set the key
 	keysNormal[key] = press;
 	int mode = 0;
@@ -264,31 +264,31 @@ void cGame::ReadKeyboard(unsigned char key, int x, int y, bool press)
 	}
 
 	//cuando se deja de pulsar una tecla de direccion lateral cuando se desplaza en diagonal, los frames de los player pueden cambiar
-	if (!press && (keys[P1_LEFT] || keys[P1_RIGHT]) && !Player1.IsAttacking())
+	if ((keys[P1_LEFT] || keys[P1_RIGHT]) && !Player1.IsAttacking())
 		Player1.StopP1();
 
 	//cuando se deja de pulsar la tecla de skill, los frames de los player cambian
-	if (!press && keys[P1_SKILL])
+	if (!keys[P1_SKILL])
 		Player1.StopDoingSkillP1();
-	if (!press && keys[P2_SKILL])
+	if (!keys[P2_SKILL])
 		Player2.StopDoingSkill();
 
-	//solo se reconoce un ataque si la tecla de ataque se despulsa despues de estar pulsada y no se estaba pulsando la tecla de skill
-	if (!press && keys[P1_ATTACK] && keys[P1_ATTACK] && !keys[P1_SKILL])
+	//only an attack is recognized if the attack key is de-activated after being pressed and the skill key was not being pressed
+	if (keys[P1_ATTACK] && keys[P1_ATTACK] && !keys[P1_SKILL])
 		p1_attacks = true;
-	if (!press && keys[P2_ATTACK] && keys[P2_ATTACK] && !keys[P2_SKILL])
+	if (keys[P2_ATTACK] && keys[P2_ATTACK] && !keys[P2_SKILL])
 		p2_attacks = true;
 
 	//en el momento en que se pulsa la tecla de skill la carga se pierde
-	if (press && keys[P1_SKILL])
+	if (keys[P1_SKILL])
 		Player1.SetCharge(0);
-	if (press && keys[P2_SKILL])
+	if (keys[P2_SKILL])
 		Player2.SetCharge(0);
 }
 
 void cGame::ReadSpecialKeyboard(unsigned char key, int x, int y, bool press)
 {
-	std::cout << "special: " << key << std::endl;
+	// std::cout << "special: " << key << std::endl;
 	// only captures special glut keys such as arrow keys
 	keysSpecial[key] = press;
 	int mode = 1;
@@ -342,7 +342,7 @@ void cGame::ReadSpecialKeyboard(unsigned char key, int x, int y, bool press)
 	}
 
 	//cuando se deja de pulsar una tecla de direccion lateral cuando se desplaza en diagonal, los frames de los player pueden cambiar
-	if (!press && (keys[P2_LEFT] || keys[P2_RIGHT]) && !Player2.IsAttacking())
+	if ((keys[P2_LEFT] || keys[P2_RIGHT]) && !Player2.IsAttacking())
 		Player2.Stop();
 
 	if (key == GLUT_KEY_F1 && press)
@@ -562,6 +562,7 @@ bool cGame::Process()
 		}
 		else
 		{
+		    std::cout << "attack! " << std::endl;
 			if (Player1.GetSP() >= ATTACK_COST)
 			{
 				Player1.StartAttack();

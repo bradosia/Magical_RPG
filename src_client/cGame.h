@@ -12,7 +12,7 @@
 #include "cSound.h"
 #include "cShader.h"
 
-//dimensiones de la window inicial
+//initial window dimensions
 #define GAME_WIDTH	((SCENE_WIDTH-2)*TILE_SIZE + SCENE_Xo*2) //valores compuestos de #define siempre encerrados en parentesis
 #define GAME_HEIGHT int((SCENE_WIDTH-2)*TILE_SIZE*1.5f + SCENE_Yo*2)
 
