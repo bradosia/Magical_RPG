@@ -208,47 +208,143 @@ void cGame::Finalize()
 //Input
 void cGame::ReadKeyboard(unsigned char key, int x, int y, bool press)
 {
-	std::cout << "test\n";
 	if (key >= 'A' && key <= 'Z')
 		key += 32;
+	std::cout << "key: " << key << std::endl;
+	// first set the key
+	keysNormal[key] = press;
+	int mode = 0;
+	if (KEY_P1_UP_T == mode && key == KEY_P1_UP)
+	{
+		keys[P1_UP] = press;
+	}
+	else if (KEY_P1_DOWN_T == mode && key == KEY_P1_DOWN)
+	{
+		keys[P1_DOWN] = press;
+	}
+	else if (KEY_P1_RIGHT_T == mode && key == KEY_P1_RIGHT)
+	{
+		keys[P1_RIGHT] = press;
+	}
+	else if (KEY_P1_LEFT_T == mode && key == KEY_P1_LEFT)
+	{
+		keys[P1_LEFT] = press;
+	}
+	else if (KEY_P1_ATTACK_T == mode && key == KEY_P1_ATTACK)
+	{
+		keys[P1_ATTACK] = press;
+	}
+	else if (KEY_P1_SKILL_T == mode && key == KEY_P1_SKILL)
+	{
+		keys[P1_SKILL] = press;
+	}
+	else if (KEY_P2_UP_T == mode && key == KEY_P2_UP)
+	{
+		keys[P2_UP] = press;
+	}
+	else if (KEY_P2_DOWN_T == mode && key == KEY_P2_DOWN)
+	{
+		keys[P2_DOWN] = press;
+	}
+	else if (KEY_P2_RIGHT_T == mode && key == KEY_P2_RIGHT)
+	{
+		keys[P2_RIGHT] = press;
+	}
+	else if (KEY_P2_LEFT_T == mode && key == KEY_P2_LEFT)
+	{
+		keys[P2_LEFT] = press;
+	}
+	else if (KEY_P2_ATTACK_T == mode && key == KEY_P2_ATTACK)
+	{
+		keys[P2_ATTACK] = press;
+	}
+	else if (KEY_P2_SKILL_T == mode && key == KEY_P2_SKILL)
+	{
+		keys[P2_SKILL] = press;
+	}
 
 	//cuando se deja de pulsar una tecla de direccion lateral cuando se desplaza en diagonal, los frames de los player pueden cambiar
-	if (!press && (key == P1_LEFT || key == P1_RIGHT) && !Player1.IsAttacking())
+	if (!press && (keys[P1_LEFT] || keys[P1_RIGHT]) && !Player1.IsAttacking())
 		Player1.StopP1();
 
 	//cuando se deja de pulsar la tecla de skill, los frames de los player cambian
-	if (!press && key == P1_SKILL)
+	if (!press && keys[P1_SKILL])
 		Player1.StopDoingSkillP1();
-	if (!press && key == P2_SKILL)
+	if (!press && keys[P2_SKILL])
 		Player2.StopDoingSkill();
 
 	//solo se reconoce un ataque si la tecla de ataque se despulsa despues de estar pulsada y no se estaba pulsando la tecla de skill
-	if (!press && key == P1_ATTACK && keys[P1_ATTACK] && !keys[P1_SKILL])
+	if (!press && keys[P1_ATTACK] && keys[P1_ATTACK] && !keys[P1_SKILL])
 		p1_attacks = true;
-	if (!press && key == P2_ATTACK && keys[P2_ATTACK] && !keys[P2_SKILL])
+	if (!press && keys[P2_ATTACK] && keys[P2_ATTACK] && !keys[P2_SKILL])
 		p2_attacks = true;
 
 	//en el momento en que se pulsa la tecla de skill la carga se pierde
-	if (press && key == P1_SKILL)
+	if (press && keys[P1_SKILL])
 		Player1.SetCharge(0);
-	if (press && key == P2_SKILL)
+	if (press && keys[P2_SKILL])
 		Player2.SetCharge(0);
-
-	if (key != GLUT_KEY_UP && key != GLUT_KEY_DOWN && key != GLUT_KEY_LEFT
-			&& key != GLUT_KEY_RIGHT)
-		keys[key] = press;
 }
 
 void cGame::ReadSpecialKeyboard(unsigned char key, int x, int y, bool press)
 {
-	std::cout << "SPECIAL\n";
+	std::cout << "special: " << key << std::endl;
+	// only captures special glut keys such as arrow keys
+	keysSpecial[key] = press;
+	int mode = 1;
+	if (KEY_P1_UP_T == mode && key == KEY_P1_UP)
+	{
+		keys[P1_UP] = press;
+	}
+	else if (KEY_P1_DOWN_T == mode && key == KEY_P1_DOWN)
+	{
+		keys[P1_DOWN] = press;
+	}
+	else if (KEY_P1_RIGHT_T == mode && key == KEY_P1_RIGHT)
+	{
+		keys[P1_RIGHT] = press;
+	}
+	else if (KEY_P1_LEFT_T == mode && key == KEY_P1_LEFT)
+	{
+		keys[P1_LEFT] = press;
+	}
+	else if (KEY_P1_ATTACK_T == mode && key == KEY_P1_ATTACK)
+	{
+		keys[P1_ATTACK] = press;
+	}
+	else if (KEY_P1_SKILL_T == mode && key == KEY_P1_SKILL)
+	{
+		keys[P1_SKILL] = press;
+	}
+	else if (KEY_P2_UP_T == mode && key == KEY_P2_UP)
+	{
+		keys[P2_UP] = press;
+	}
+	else if (KEY_P2_DOWN_T == mode && key == KEY_P2_DOWN)
+	{
+		keys[P2_DOWN] = press;
+	}
+	else if (KEY_P2_RIGHT_T == mode && key == KEY_P2_RIGHT)
+	{
+		keys[P2_RIGHT] = press;
+	}
+	else if (KEY_P2_LEFT_T == mode && key == KEY_P2_LEFT)
+	{
+		keys[P2_LEFT] = press;
+	}
+	else if (KEY_P2_ATTACK_T == mode && key == KEY_P2_ATTACK)
+	{
+		keys[P2_ATTACK] = press;
+	}
+	else if (KEY_P2_SKILL_T == mode && key == KEY_P2_SKILL)
+	{
+		keys[P2_SKILL] = press;
+	}
+
 	//cuando se deja de pulsar una tecla de direccion lateral cuando se desplaza en diagonal, los frames de los player pueden cambiar
-	if (!press && (key == P2_LEFT || key == P2_RIGHT) && !Player2.IsAttacking())
+	if (!press && (keys[P2_LEFT] || keys[P2_RIGHT]) && !Player2.IsAttacking())
 		Player2.Stop();
 
-	if (key == GLUT_KEY_UP || key == GLUT_KEY_DOWN || key == GLUT_KEY_LEFT
-			|| key == GLUT_KEY_RIGHT)
-		keys[key] = press;
 	if (key == GLUT_KEY_F1 && press)
 		ia = !ia;
 	if (key == GLUT_KEY_F10 && press)

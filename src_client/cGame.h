@@ -26,20 +26,47 @@
 #define TOTAL_LEVELS	  2
 #define DYNAMIC_FILENAME  "dynamic_layer"
 
-//controls
-#define P1_UP		'i'
-#define P1_DOWN		'k'
-#define P1_LEFT		'j'
-#define P1_RIGHT	'l'
-#define P1_ATTACK	'z'
-#define P1_SKILL	'x'
+// keys
+#define KEY_P1_UP_T  	 0
+#define KEY_P1_UP		'w'
+#define KEY_P1_DOWN_T    0
+#define KEY_P1_DOWN		's'
+#define KEY_P1_LEFT_T    0
+#define KEY_P1_LEFT		'a'
+#define KEY_P1_RIGHT_T   0
+#define KEY_P1_RIGHT	'd'
+#define KEY_P1_ATTACK_T  0
+#define KEY_P1_ATTACK	'q'
+#define KEY_P1_SKILL_T   0
+#define KEY_P1_SKILL	'e'
 
-#define P2_UP		GLUT_KEY_UP
-#define P2_DOWN		GLUT_KEY_DOWN
-#define P2_LEFT		GLUT_KEY_LEFT
-#define P2_RIGHT	GLUT_KEY_RIGHT
-#define P2_ATTACK	'*'
-#define P2_SKILL	'-'
+#define KEY_P2_UP_T  	1
+#define KEY_P2_UP		GLUT_KEY_UP
+#define KEY_P2_DOWN_T  	1
+#define KEY_P2_DOWN		GLUT_KEY_DOWN
+#define KEY_P2_LEFT_T  	1
+#define KEY_P2_LEFT		GLUT_KEY_LEFT
+#define KEY_P2_RIGHT_T  1
+#define KEY_P2_RIGHT	GLUT_KEY_RIGHT
+#define KEY_P2_ATTACK_T 0
+#define KEY_P2_ATTACK	','
+#define KEY_P2_SKILL_T  0
+#define KEY_P2_SKILL	'.'
+
+// key alias
+#define P1_UP		0
+#define P1_DOWN		1
+#define P1_LEFT		2
+#define P1_RIGHT	3
+#define P1_ATTACK	4
+#define P1_SKILL	5
+
+#define P2_UP		10
+#define P2_DOWN		11
+#define P2_LEFT		12
+#define P2_RIGHT	13
+#define P2_ATTACK	14
+#define P2_SKILL	15
 
 class cGame
 {
@@ -62,6 +89,8 @@ public:
 	void Render();
 
 private:
+	unsigned char keysNormal[256];
+	unsigned char keysSpecial[256];
 	unsigned char keys[256];
 	cRect visible_area;
 	int state,level;

@@ -4,6 +4,7 @@
 #define GLUT_NO_LIB_PRAGMA
 #define GLUT_NO_WARNING_DISABLE
 #define GLUT_BUILDING_LIB
+#define GLUT_DISABLE_ATEXIT_HACK
 
 #include <iostream>
 #include <typeinfo>
