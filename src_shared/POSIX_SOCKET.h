@@ -10,7 +10,7 @@
 //============================================================================
 #ifndef POSIX_SOCKET_H
 #define POSIX_SOCKET_H
-#ifdef __linux__
+#if defined __linux__ || defined __CYGWIN__
 
 #include <cstring>       // strlen
 #include <iostream>

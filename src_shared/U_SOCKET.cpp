@@ -49,5 +49,5 @@ void U_SOCKET::sockListen(std::function<void(U_SOCKET*)>* listenCB)
 void U_SOCKET::sockLoop(std::function<void(U_SOCKET*)>* listenCB)
 {
 	std::function<void(UU_SOCKET*)> listenCB2 = [&listenCB](UU_SOCKET *sock_){(*listenCB)(new U_SOCKET(sock_));};
-	sockObjPtr->sockListen(&listenCB2);
+	sockObjPtr->sockLoop(&listenCB2);
 }

@@ -44,7 +44,7 @@ all: server.exe
 # Tool invocations
 server.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: Cygwin C++ Linker'
+	@echo 'Invoking: MinGW C++ Linker'
 	g++  -o "server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '

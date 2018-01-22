@@ -21,10 +21,10 @@
 #include <functional>
 #include <string.h>
 
-#ifdef __linux__
+#if defined __linux__ || defined __CYGWIN__
 #include "POSIX_SOCKET.h"
 #define UU_SOCKET POSIX_SOCKET
-#elif defined _WIN32 || defined WIN32
+#elif defined _WIN32
 #include "WIN_SOCKET.h"
 #define UU_SOCKET WIN_SOCKET
 #endif

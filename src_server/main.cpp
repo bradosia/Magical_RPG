@@ -12,22 +12,22 @@
 #include <iostream>
 #include <string>
 #include <functional>
-#include "../src_shared/POSIX_SOCKET.h"
+#include "../src_shared/U_SOCKET.h"
 
-void listenCB(POSIX_SOCKET* socketServer);
+void listenCB(U_SOCKET* socketServer);
 
 int main()
 {
-	POSIX_SOCKET* socketServer;
+	U_SOCKET* socketServer;
 	try
 	{
-		socketServer = new POSIX_SOCKET(9573);
+		socketServer = new U_SOCKET(9573);
 		socketServer->sockSetup();
 		std::cout << "Binding..." << std::endl;
 		socketServer->sockBind();
 		std::cout << "Listening..." << std::endl;
 		socketServer->sockListen(
-				new std::function<void(POSIX_SOCKET*)>(&listenCB));
+				new std::function<void(U_SOCKET*)>(&listenCB));
 	} catch (const std::exception& e)
 	{
 		std::cout << "Error: " << e.what() << std::endl;
@@ -35,7 +35,7 @@ int main()
 	return 0;
 }
 
-void listenCB(POSIX_SOCKET* socketServer)
+void listenCB(U_SOCKET* socketServer)
 {
 
 }

@@ -21,10 +21,10 @@
 #include <functional>
 #include <string.h>
 
-#ifdef __linux__
+#if defined __linux__ || defined __CYGWIN__
 #include "POSIX_HTTP.h"
 #define UU_HTTP POSIX_HTTP
-#elif defined _WIN32 || defined __WIN32__ || __MINGW32__
+#elif defined _WIN32
 #include "WIN_HTTP.h"
 #define UU_HTTP WIN_HTTP
 #endif
