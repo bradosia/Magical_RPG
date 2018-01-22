@@ -52,8 +52,8 @@ WIN_SOCKET::WIN_SOCKET(std::string host_, int port_)
 			errMsg = "Host not found";
 		}
 		/*throw std::runtime_error(
-				"Error Code " + std::to_string(err)
-						+ (errMsg.length() > 0 ? ": " + errMsg : ""));*/
+		 "Error Code " + std::to_string(err)
+		 + (errMsg.length() > 0 ? ": " + errMsg : ""));*/
 	}
 
 	try
@@ -163,16 +163,14 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 		std::cout << ">";
 		std::string data;
 		std::getline(std::cin, data);
-		memset(&msg, 0, sizeof(msg)); //clear the buffer
-		strcpy(msg, data.c_str());
 		if (data == "exit")
 		{
 			//send to the client that server has closed the connection
-			send(acceptSd, (char*) &msg, strlen(msg), 0);
+			sendFromServer(data);
 			break;
 		}
 		//send the message to client
-		bytesWritten += send(acceptSd, (char*) &msg, strlen(msg), 0);
+		sendFromServer(data);
 		(*listenCB)(this);
 	}
 	//we need to close the socket descriptors after we're all done
@@ -228,6 +226,14 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 			<< bytesRead << std::endl;
 	std::cout << "Elapsed time: " << elapsedTime << " secs" << std::endl;
 	std::cout << "Connection closed" << std::endl;
+}
+
+void WIN_SOCKET::sendFromServer(std::string data)
+{
+	char msg[1500];
+	memset(&msg, 0, sizeof(msg)); //clear the buffer
+	strcpy(msg, data.c_str());
+	send(acceptSd, (char*) &msg, strlen(msg), 0);
 }
 
 #endif

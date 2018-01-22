@@ -54,6 +54,7 @@ public:
 	void sockBind();
 	void sockListen(std::function<void(WIN_SOCKET*)>* listenCB);
 	void sockLoop(std::function<void(WIN_SOCKET*)>* listenCB);
+	void sendFromServer(std::string data);
 };
 
 #endif

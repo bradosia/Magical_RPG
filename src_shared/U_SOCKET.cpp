@@ -51,3 +51,7 @@ void U_SOCKET::sockLoop(std::function<void(U_SOCKET*)>* listenCB)
 	std::function<void(UU_SOCKET*)> listenCB2 = [&listenCB](UU_SOCKET *sock_){(*listenCB)(new U_SOCKET(sock_));};
 	sockObjPtr->sockLoop(&listenCB2);
 }
+
+void U_SOCKET::sendFromServer(std::string data){
+	sockObjPtr->sendFromServer(data);
+}
