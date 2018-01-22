@@ -11,6 +11,11 @@
 #include "POSIX_HTTP.h"
 #ifdef __linux__
 
+POSIX_HTTP::POSIX_HTTP()
+{
+
+}
+
 int POSIX_HTTP::socket_connect(char *host, int port_)
 {
 	int on = 1, sock;

@@ -10,17 +10,22 @@
 //============================================================================
 #include "U_HTTP.h"
 
+U_HTTP::U_HTTP()
+{
+	httpObjPtr = new UU_HTTP();
+}
+
 int U_HTTP::socket_connect(char *host, int port_)
 {
-	return UU_HTTP::socket_connect(host, port_);
+	return httpObjPtr->socket_connect(host, port_);
 }
 
 std::string U_HTTP::getWebsite(std::string url, std::string path)
 {
-	return UU_HTTP::getWebsite(url, path);
+	return httpObjPtr->getWebsite(url, path);
 }
 
 std::string U_HTTP::html(std::string response)
 {
-	return UU_HTTP::html(response);
+	return httpObjPtr->html(response);
 }

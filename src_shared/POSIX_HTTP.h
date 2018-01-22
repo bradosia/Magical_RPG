@@ -47,9 +47,10 @@ A collection of HTTP methods.
 class POSIX_HTTP
 {
 public:
-	static int socket_connect(char *host, int port);
-	static std::string getWebsite(std::string url, std::string path);
-	static std::string html (std::string response);
+	POSIX_HTTP();
+	int socket_connect(char *host, int port);
+	std::string getWebsite(std::string url, std::string path);
+	std::string html (std::string response);
 };
 #endif
 #endif

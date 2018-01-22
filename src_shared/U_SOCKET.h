@@ -24,7 +24,7 @@
 #ifdef __linux__
 #include "POSIX_SOCKET.h"
 #define UU_SOCKET POSIX_SOCKET
-#elif _WIN32
+#elif defined _WIN32 || defined WIN32
 #include "WIN_SOCKET.h"
 #define UU_SOCKET WIN_SOCKET
 #endif

@@ -1,16 +1,17 @@
 //============================================================================
-// Name        : Ravioli Racing
+// Name        : Magical RPG
 // Author      : Branden Lee
 // Version     : 0.01
 // Copyright   : GPL
-// Description : C++ Racing Game
+// Description : C++ OpenGL Sockets Multiplayer RPG
 //
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
 #ifndef WIN_HTTP_H
 #define WIN_HTTP_H
-#ifdef _WIN32
+#define _WIN32
+#ifdef _WIN32 true
 
 #include <cstring>       // strlen
 #include <iostream>
@@ -29,16 +30,17 @@
 #define BUFFER_SIZE 1024
 
 /**
-@class WIN_HTTP
-Uses libraries for a basic winsock application.
-A collection of HTTP methods.
-*/
+ @class WIN_HTTP
+ Uses libraries for a basic winsock application.
+ A collection of HTTP methods.
+ */
 class WIN_HTTP
 {
 public:
-	static int socket_connect(char *host, int port);
-	static std::string getWebsite(std::string url, std::string path);
-	static std::string html (std::string response);
+	WIN_HTTP();
+	int socket_connect(char *host, int port);
+	std::string getWebsite(std::string url, std::string path);
+	std::string html(std::string response);
 };
 
 #endif

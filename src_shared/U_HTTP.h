@@ -24,7 +24,7 @@
 #ifdef __linux__
 #include "POSIX_HTTP.h"
 #define UU_HTTP POSIX_HTTP
-#elif _WIN32
+#elif defined _WIN32 || defined __WIN32__ || __MINGW32__
 #include "WIN_HTTP.h"
 #define UU_HTTP WIN_HTTP
 #endif
@@ -36,10 +36,13 @@
  */
 class U_HTTP
 {
+private:
+	UU_HTTP *httpObjPtr;
 public:
-	static int socket_connect(char *host, int port);
-	static std::string getWebsite(std::string url, std::string path);
-	static std::string html(std::string response);
+	U_HTTP();
+	int socket_connect(char *host, int port);
+	std::string getWebsite(std::string url, std::string path);
+	std::string html(std::string response);
 };
 
 #endif

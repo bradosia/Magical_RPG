@@ -11,6 +11,11 @@
 #include "WIN_HTTP.h"
 #ifdef _WIN32
 
+WIN_HTTP::WIN_HTTP()
+{
+
+}
+
 int WIN_HTTP::socket_connect(char *host, int port_)
 {
 	int on = 1, sock;

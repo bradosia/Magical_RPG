@@ -39,13 +39,13 @@ https://www.un4seen.com/<BR><BR>
 
 ## Debian
 ```sh
-cd Ravioli_Racing\Release
-g++ ../src/Ravioli_Racing.cpp ../src/POSIX_HTTP.cpp -o Ravioli_Racing
+cd Magical_RPG\Release
+g++ ../src/Magical_RPG.cpp ../src/POSIX_HTTP.cpp -o Magical_RPG
 ```
 
 ## Windows
 ```sh
-cd Ravioli_Racing\Release
+cd Magical_RPG\Release
 make
 ```
 
@@ -53,12 +53,12 @@ make
 
 ## Debian
 ```sh
-cd Ravioli_Racing\Release
-./Ravioli_Racing
+cd Magical_RPG\Release
+./Magical_RPG
 ```
 
 ## Windows
 ```sh
-cd Ravioli_Racing\Release
-Ravioli_Racing
+cd Magical_RPG\Release
+Magical_RPG
 ```
