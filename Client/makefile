@@ -45,7 +45,7 @@ all: client.exe
 client.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -L"F:\schoolCode\Magical_RPG\src_client\lib" -static-libgcc -static-libstdc++ -o "client.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"H:\GitHub\Magical_RPG\src_client\lib" -static-libgcc -static-libstdc++ -o "client.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

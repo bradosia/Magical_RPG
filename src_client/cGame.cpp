@@ -781,7 +781,8 @@ void cGame::UpdateCamera(int h1, int h2)
 void cGame::Reshape(int w, int h) //w y h son las dimensiones de la ventana del juego
 {
 	//necesitaria modificar game_height y width
-	glViewport(0, 0, w, h);
+	//glViewport(0, 0, w, h);
+	glOrtho(0, w, 0, h,-100,100);
 }
 
 //Output

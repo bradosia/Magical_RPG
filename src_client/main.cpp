@@ -9,6 +9,9 @@
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
 
+#define PRODUCTION 0
+#define DEBUG 1
+
 #include <iostream>
 #include <string>
 #include <functional>
@@ -31,42 +34,35 @@ void serverConnect();
 
 cGame Game;
 
-void AppReshape(int w, int h)
-{
+void AppReshape(int w, int h) {
 	Game.Reshape(w, h);
 }
-void AppRender()
-{
+void AppRender() {
 	Game.Render();
 }
-void AppKeyboard(unsigned char key, int x, int y)
-{
+void AppKeyboard(unsigned char key, int x, int y) {
 	Game.ReadKeyboard(key, x, y, true);
 }
-void AppKeyboardUp(unsigned char key, int x, int y)
-{
+void AppKeyboardUp(unsigned char key, int x, int y) {
 	Game.ReadKeyboard(key, x, y, false);
 }
-void AppSpecialKeys(int key, int x, int y)
-{
+void AppSpecialKeys(int key, int x, int y) {
 	Game.ReadSpecialKeyboard(key, x, y, true);
 }
-void AppSpecialKeysUp(int key, int x, int y)
-{
+void AppSpecialKeysUp(int key, int x, int y) {
 	Game.ReadSpecialKeyboard(key, x, y, false);
 }
-void AppMouse(int button, int state, int x, int y)
-{
+void AppMouse(int button, int state, int x, int y) {
 	Game.ReadMouse(button, state, x, y);
 }
-void AppIdle()
-{
+void AppIdle() {
 	if (!Game.Loop())
 		exit(0);
 }
 
-int main(int argc, char** argv)
-{
+void init(int argc, char** argv) {
+	//XWIN::removeConsole(); // closing the openGL window wont close the main process
+	std::string projectName = "Magical RPG";
 	std::thread first(serverConnect);
 
 	int res_x, res_y, pos_x, pos_y;
@@ -84,8 +80,11 @@ int main(int argc, char** argv)
 	pos_y = (res_y >> 1) - (GAME_HEIGHT >> 1);
 
 	glutInitWindowPosition(pos_x, pos_y);
-	glutInitWindowSize(GAME_WIDTH, GAME_HEIGHT);
-	glutCreateWindow("Ravioli Racing");
+	//glutInitWindowSize(GAME_WIDTH, GAME_HEIGHT);
+	glutInitWindowSize(512, 288);
+
+	glutCreateWindow(projectName.c_str());
+	//XWIN::find(NULL, projectName); //get the window handler
 
 	/*glutGameModeString("800x600:32");
 	 glutEnterGameMode();*/
@@ -104,8 +103,7 @@ int main(int argc, char** argv)
 
 	//GLEW initialization
 	GLint GlewInitResult = glewInit();
-	if (GLEW_OK != GlewInitResult)
-	{
+	if (GLEW_OK != GlewInitResult) {
 		printf("ERROR: %s\n", glewGetErrorString(GlewInitResult));
 		exit(EXIT_FAILURE);
 	}
@@ -115,20 +113,31 @@ int main(int argc, char** argv)
 
 	//Application loop
 	glutMainLoop();
+}
 
+#if DEBUG
+int main(int argc, char** argv) {
+	init(argc, argv);
 	return 0;
 }
+#endif
 
-void listenCB(U_SOCKET* socketServer)
+#if PRODUCTION && defined _WIN
+INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+    PSTR lpCmdLine, INT nCmdShow)
 {
+	init(0, 0);
+    return 0;
+}
+#endif
+
+void listenCB(U_SOCKET* socketServer) {
 
 }
 
-void serverConnect()
-{
+void serverConnect() {
 	U_SOCKET* socketServer;
-	try
-	{
+	try {
 		std::cout << "New Socket..." << std::endl;
 		socketServer = new U_SOCKET("localhost", 9573);
 		std::cout << "Setup..." << std::endl;
@@ -137,8 +146,7 @@ void serverConnect()
 		socketServer->sockConnect();
 		std::cout << "Looping..." << std::endl;
 		socketServer->sockLoop(new std::function<void(U_SOCKET*)>(&listenCB));
-	} catch (const std::exception& e)
-	{
+	} catch (const std::exception& e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
 }

@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 
-#define SCENE_Xo		  0   //borde negro en px
+#define SCENE_Xo		  0   //black px on the border
 #define SCENE_Yo		  0
 #define SCENE_WIDTH		  20  //en tiles
 #define SCENE_HEIGHT	  160

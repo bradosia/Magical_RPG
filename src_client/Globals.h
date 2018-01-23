@@ -16,5 +16,6 @@
 #include <list>
 #include <fstream>
 #include <string>
+#include "xwin.h"
 #include "include/GL/glew.h" //las comillas sirven para que ese fichero se carge buscandolo en la propia carpeta del proyecto
 #include "include/GL/glut.h"
