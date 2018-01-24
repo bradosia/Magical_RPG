@@ -148,10 +148,98 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 	//also keep track of the amount of data sent as well
 	int bytesRead, bytesWritten = 0;
 	char msg[1500];
+	int high_sock = serverSd;
 	while (listenFlag)
 	{
+		int i;
+
+		build_fd_sets(&read_fds, &write_fds, &except_fds);
+
+		high_sock = serverSd;
+		for (i = 0; i < MAX_CLIENTS; ++i)
+		{
+			if (connection_list[i].socket > high_sock)
+				high_sock = connection_list[i].socket;
+		}
+
+		int activity = select(high_sock + 1, &read_fds, &write_fds, &except_fds,
+				NULL);
+
+		switch (activity)
+		{
+		case -1:
+			perror("select()");
+			shutdown_properly(EXIT_FAILURE);
+
+		case 0:
+			// you should never get here
+			printf("select() returns 0.\n");
+			shutdown_properly(EXIT_FAILURE);
+
+		default:
+			/* All set fds should be checked. */
+			if (FD_ISSET(STDIN_FILENO, &read_fds))
+			{
+				if (handle_read_from_stdin() != 0)
+					shutdown_properly(EXIT_FAILURE);
+			}
+
+			if (FD_ISSET(serverSd, &read_fds))
+			{
+				handle_new_connection();
+			}
+
+			if (FD_ISSET(STDIN_FILENO, &except_fds))
+			{
+				printf("except_fds for stdin.\n");
+				shutdown_properly(EXIT_FAILURE);
+			}
+
+			if (FD_ISSET(serverSd, &except_fds))
+			{
+				printf("Exception listen socket fd.\n");
+				shutdown_properly(EXIT_FAILURE);
+			}
+
+			int n =connection_list.size();
+			for (i = 0; i < n; ++i)
+			{
+				if (connection_list[i]->socket != NO_SOCKET
+						&& FD_ISSET(connection_list[i]->socket, &read_fds))
+				{
+					if (receive_from_peer(connection_list[i],
+							&handle_received_message) != 0)
+					{
+						close_client_connection(connection_list[i]);
+						continue;
+					}
+				}
+
+				if (connection_list[i]->socket != NO_SOCKET
+						&& FD_ISSET(connection_list[i]->socket, &write_fds))
+				{
+					if (send_to_peer(connection_list[i]) != 0)
+					{
+						close_client_connection(connection_list[i]);
+						continue;
+					}
+				}
+
+				if (connection_list[i]->socket != NO_SOCKET
+						&& FD_ISSET(connection_list[i]->socket, &except_fds))
+				{
+					printf("Exception client fd.\n");
+					close_client_connection(connection_list[i]);
+					continue;
+				}
+			}
+		}
+
+		std::cout
+				<< "And we are still waiting for clients' or stdin activity. You can type something to send:\n";
+
 		//receive a message from the client (listen)
-		std::cout << "Awaiting client response..." << std::endl;
+		/*std::cout << "Awaiting client response..." << std::endl;
 		memset(&msg, 0, sizeof(msg));	//clear the buffer
 		bytesRead += recv(acceptSd, (char*) &msg, sizeof(msg), 0);
 		if (!strcmp(msg, "exit"))
@@ -170,7 +258,7 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 			break;
 		}
 		//send the message to client
-		sendFromServer(data);
+		sendFromServer(data);*/
 		(*listenCB)(this);
 	}
 	//we need to close the socket descriptors after we're all done
@@ -195,8 +283,6 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 	char msg[1500];
 	while (1)
 	{
-		build_fd_sets(&read_fds, &write_fds, &except_fds);
-
 		std::cout << ">";
 		std::string data;
 		std::getline(std::cin, data);
@@ -230,30 +316,388 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 	std::cout << "Connection closed" << std::endl;
 }
 
-int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds, fd_set *except_fds)
+int WIN_SOCKET::prepare_message(char *sender, char *data, message_t *message)
+{
+  sprintf(message->sender, "%s", sender);
+  sprintf(message->data, "%s", data);
+  return 0;
+}
+
+int WIN_SOCKET::print_message(message_t *message)
+{
+  printf("Message: \"%s: %s\"\n", message->sender, message->data);
+  return 0;
+}
+
+int WIN_SOCKET::create_message_queue(int queue_size, message_queue_t *queue)
+{
+  queue->data = calloc(queue_size, sizeof(message_t));
+  queue->size = queue_size;
+  queue->current = 0;
+
+  return 0;
+}
+
+void WIN_SOCKET:: delete_message_queue(message_queue_t *queue)
+{
+  free(queue->data);
+  queue->data = NULL;
+}
+
+int WIN_SOCKET::enqueue(message_queue_t *queue, message_t *message)
+{
+  if (queue->current == queue->size)
+    return -1;
+
+  memcpy(&queue->data[queue->current], message, sizeof(message_t));
+  queue->current++;
+
+  return 0;
+}
+
+int WIN_SOCKET::dequeue(message_queue_t *queue, message_t *message)
+{
+  if (queue->current == 0)
+    return -1;
+
+  memcpy(message, &queue->data[queue->current - 1], sizeof(message_t));
+  queue->current--;
+
+  return 0;
+}
+
+int WIN_SOCKET::dequeue_all(message_queue_t *queue)
+{
+  queue->current = 0;
+
+  return 0;
+}
+
+
+
+int WIN_SOCKET::delete_peer(peer_t *peer)
+{
+  closesocket(peer->socket);
+  delete_message_queue(&peer->send_buffer);
+}
+
+int WIN_SOCKET::create_peer(peer_t *peer)
+{
+  create_message_queue(MAX_MESSAGES_BUFFER_SIZE, &peer->send_buffer);
+
+  peer->current_sending_byte   = -1;
+  peer->current_receiving_byte = 0;
+
+  return 0;
+}
+
+char* WIN_SOCKET::peer_get_addres_str(peer_t *peer)
+{
+  /*static char ret[INET_ADDRSTRLEN + 10];
+  char peer_ipv4_str[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &peer->addres.sin_addr, peer_ipv4_str, INET_ADDRSTRLEN);
+  sprintf(ret, "%s:%d", peer_ipv4_str, peer->addres.sin_port);
+  return ret;*/
+	return "test";
+}
+
+int WIN_SOCKET::peer_add_to_send(peer_t *peer, message_t *message)
+{
+  return enqueue(&peer->send_buffer, message);
+}
+
+/* Receive message from peer and handle it with message_handler(). */
+int WIN_SOCKET::receive_from_peer(peer_t *peer, int (*message_handler)(message_t *))
+{
+  printf("Ready for recv() from %s.\n", peer_get_addres_str(peer));
+
+  size_t len_to_receive;
+  ssize_t received_count;
+  size_t received_total = 0;
+  do {
+    // Is completely received?
+    if (peer->current_receiving_byte >= sizeof(peer->receiving_buffer)) {
+      message_handler(&peer->receiving_buffer);
+      peer->current_receiving_byte = 0;
+    }
+
+    // Count bytes to send.
+    len_to_receive = sizeof(peer->receiving_buffer) - peer->current_receiving_byte;
+    if (len_to_receive > MAX_SEND_SIZE)
+      len_to_receive = MAX_SEND_SIZE;
+
+    printf("Let's try to recv() %zd bytes... ", len_to_receive);
+    received_count = recv(peer->socket, (char *)&peer->receiving_buffer + peer->current_receiving_byte, len_to_receive, MSG_DONTWAIT);
+    if (received_count < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        printf("peer is not ready right now, try again later.\n");
+      }
+      else {
+        perror("recv() from peer error");
+        return -1;
+      }
+    }
+    else if (received_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      break;
+    }
+    // If recv() returns 0, it means that peer gracefully shutdown. Shutdown client.
+    else if (received_count == 0) {
+      printf("recv() 0 bytes. Peer gracefully shutdown.\n");
+      return -1;
+    }
+    else if (received_count > 0) {
+      peer->current_receiving_byte += received_count;
+      received_total += received_count;
+      printf("recv() %zd bytes\n", received_count);
+    }
+  } while (received_count > 0);
+
+  printf("Total recv()'ed %zu bytes.\n", received_total);
+  return 0;
+}
+
+int WIN_SOCKET::send_to_peer(peer_t *peer)
+{
+  printf("Ready for send() to %s.\n", peer_get_addres_str(peer));
+
+  size_t len_to_send;
+  ssize_t send_count;
+  size_t send_total = 0;
+  do {
+    // If sending message has completely sent and there are messages in queue, why not send them?
+    if (peer->current_sending_byte < 0 || peer->current_sending_byte >= sizeof(peer->sending_buffer)) {
+      printf("There is no pending to send() message, maybe we can find one in queue... ");
+      if (dequeue(&peer->send_buffer, &peer->sending_buffer) != 0) {
+        peer->current_sending_byte = -1;
+        printf("No, there is nothing to send() anymore.\n");
+        break;
+      }
+      printf("Yes, pop and send() one of them.\n");
+      peer->current_sending_byte = 0;
+    }
+
+    // Count bytes to send.
+    len_to_send = sizeof(peer->sending_buffer) - peer->current_sending_byte;
+    if (len_to_send > MAX_SEND_SIZE)
+      len_to_send = MAX_SEND_SIZE;
+
+    printf("Let's try to send() %zd bytes... ", len_to_send);
+    send_count = send(peer->socket, (char *)&peer->sending_buffer + peer->current_sending_byte, len_to_send, 0);
+    if (send_count < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        printf("peer is not ready right now, try again later.\n");
+      }
+      else {
+        perror("send() from peer error");
+        return -1;
+      }
+    }
+    // we have read as many as possible
+    else if (send_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      break;
+    }
+    else if (send_count == 0) {
+      printf("send()'ed 0 bytes. It seems that peer can't accept data right now. Try again later.\n");
+      break;
+    }
+    else if (send_count > 0) {
+      peer->current_sending_byte += send_count;
+      send_total += send_count;
+      printf("send()'ed %zd bytes.\n", send_count);
+    }
+  } while (send_count > 0);
+
+  printf("Total send()'ed %zu bytes.\n", send_total);
+  return 0;
+}
+
+
+int WIN_SOCKET::read_from_stdin(char *read_buffer, size_t max_len)
+{
+  memset(read_buffer, 0, max_len);
+
+  ssize_t read_count = 0;
+  ssize_t total_read = 0;
+
+  do {
+    read_count = read(STDIN_FILENO, read_buffer, max_len);
+    if (read_count < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+      perror("read()");
+      return -1;
+    }
+    else if (read_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      break;
+    }
+    else if (read_count > 0) {
+      total_read += read_count;
+      if (total_read > max_len) {
+        printf("Message too large and will be chopped. Please try to be shorter next time.\n");
+        fflush(STDIN_FILENO);
+        break;
+      }
+    }
+  } while (read_count > 0);
+
+  size_t len = strlen(read_buffer);
+  if (len > 0 && read_buffer[len - 1] == '\n')
+    read_buffer[len - 1] = '\0';
+
+  printf("Read from stdin %zu bytes. Let's prepare message to send.\n", strlen(read_buffer));
+
+  return 0;
+}
+
+
+void WIN_SOCKET::handle_signal_action(int sig_number)
+{
+  if (sig_number == SIGINT) {
+    printf("SIGINT was catched!\n");
+    shutdown_properly(EXIT_SUCCESS);
+  }
+ /* else if (sig_number == SIGPIPE) {
+    printf("SIGPIPE was catched!\n");
+    shutdown_properly(EXIT_SUCCESS);
+  }*/
+}
+
+int WIN_SOCKET::setup_signals()
+{
+	typedef void (WIN_SOCKET::*FnPointer)(int);
+	FnPointer pnt = &WIN_SOCKET::handle_signal_action;
+  signal(SIGABRT, *pnt);
+  /*
+  if (signal(SIGINT, &sa, 0) != 0) {
+    perror("sigaction()");
+    return -1;
+  }
+  if (signal(SIGPIPE, &sa, 0) != 0) {
+    perror("sigaction()");
+    return -1;
+  }*/
+
+  return 0;
+}
+
+void WIN_SOCKET::shutdown_properly(int code)
 {
   int i;
   int n = connection_list.size();
 
-  FD_ZERO(read_fds);
-  FD_SET(STDIN_FILENO, read_fds);
-  FD_SET(serverSd, read_fds);
+  closesocket(serverSd);
+
   for (i = 0; i < n; ++i)
     if (connection_list[i]->socket != NO_SOCKET)
-      FD_SET(connection_list[i]->socket, read_fds);
+      closesocket(connection_list[i]->socket);
 
-  FD_ZERO(write_fds);
-  for (i = 0; i < n; ++i)
-    if (connection_list[i]->socket != NO_SOCKET && connection_list[i]->send_buffer->current > 0)
-      FD_SET(connection_list[i]->socket, write_fds);
+  printf("Shutdown server properly.\n");
+  exit(code);
+}
 
-  FD_ZERO(except_fds);
-  FD_SET(STDIN_FILENO, except_fds);
-  FD_SET(serverSd, except_fds);
-  for (i = 0; i < n; ++i)
-    if (connection_list[i]->socket != NO_SOCKET)
-      FD_SET(connection_list[i]->socket, except_fds);
+int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
+		fd_set *except_fds)
+{
+	int i;
+	int n = connection_list.size();
 
+	FD_ZERO(read_fds);
+	FD_SET(STDIN_FILENO, read_fds);
+	FD_SET(serverSd, read_fds);
+	for (i = 0; i < n; ++i)
+		if (connection_list[i]->socket != NO_SOCKET)
+			FD_SET(connection_list[i]->socket, read_fds);
+
+	FD_ZERO(write_fds);
+	for (i = 0; i < n; ++i)
+		if (connection_list[i]->socket != NO_SOCKET
+				&& connection_list[i]->send_buffer.current > 0)
+			FD_SET(connection_list[i]->socket, write_fds);
+
+	FD_ZERO(except_fds);
+	FD_SET(STDIN_FILENO, except_fds);
+	FD_SET(serverSd, except_fds);
+	for (i = 0; i < n; ++i)
+		if (connection_list[i]->socket != NO_SOCKET)
+			FD_SET(connection_list[i]->socket, except_fds);
+
+	return 0;
+}
+
+int WIN_SOCKET::handle_new_connection()
+{
+  struct sockaddr_in client_addr;
+  memset(&client_addr, 0, sizeof(client_addr));
+  socklen_t client_len = sizeof(client_addr);
+  int new_client_sock = accept(serverSd, (struct sockaddr *)&client_addr, &client_len);
+  if (new_client_sock < 0) {
+    perror("accept()");
+    return -1;
+  }
+
+  char client_ipv4_str[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &client_addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
+
+  printf("Incoming connection from %s:%d.\n", client_ipv4_str, client_addr.sin_port);
+
+  int i;
+  int n =connection_list.size();
+  for (i = 0; i < n; ++i) {
+    if (connection_list[i]->socket == NO_SOCKET) {
+      connection_list[i]->socket = new_client_sock;
+      connection_list[i]->addres = client_addr;
+      connection_list[i]->current_sending_byte   = -1;
+      connection_list[i]->current_receiving_byte = 0;
+      return 0;
+    }
+  }
+
+  printf("There is too much connections. Close new connection %s:%d.\n", client_ipv4_str, client_addr.sin_port);
+  closesocket(new_client_sock);
+  return -1;
+}
+
+int WIN_SOCKET::close_client_connection(peer_t *client)
+{
+  printf("Close client socket for %s.\n", peer_get_addres_str(client));
+
+  closesocket(client->socket);
+  client->socket = NO_SOCKET;
+  dequeue_all(&client->send_buffer);
+  client->current_sending_byte   = -1;
+  client->current_receiving_byte = 0;
+}
+
+/* Reads from stdin and create new message. This message enqueues to send queueu. */
+int WIN_SOCKET::handle_read_from_stdin()
+{
+  char read_buffer[DATA_MAXSIZE]; // buffer for stdin
+  if (read_from_stdin(read_buffer, DATA_MAXSIZE) != 0)
+    return -1;
+
+  // Create new message and enqueue it.
+  message_t new_message;
+  prepare_message("Server", read_buffer, &new_message);
+  print_message(&new_message);
+
+  /* enqueue message for all clients */
+  int i;
+  int n =connection_list.size();
+  for (i = 0; i < n; ++i) {
+    if (connection_list[i]->socket != NO_SOCKET) {
+      if (peer_add_to_send(connection_list[i], &new_message) != 0) {
+        printf("Send buffer was overflowed, we lost this message!\n");
+        continue;
+      }
+      printf("New message to send was enqueued right now.\n");
+    }
+  }
+
+  return 0;
+}
+
+int WIN_SOCKET::handle_received_message(message_t *message)
+{
+  printf("Received message from client.\n");
+  print_message(message);
   return 0;
 }
 
