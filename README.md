@@ -33,7 +33,7 @@ https://www.un4seen.com/<BR><BR>
 - g++
 
 ## Windows
-- cygwin
+- mingw
 
 # Build Instructions
 
