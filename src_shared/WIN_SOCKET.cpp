@@ -195,6 +195,8 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 	char msg[1500];
 	while (1)
 	{
+		build_fd_sets(&read_fds, &write_fds, &except_fds);
+
 		std::cout << ">";
 		std::string data;
 		std::getline(std::cin, data);
@@ -226,6 +228,33 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 			<< bytesRead << std::endl;
 	std::cout << "Elapsed time: " << elapsedTime << " secs" << std::endl;
 	std::cout << "Connection closed" << std::endl;
+}
+
+int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds, fd_set *except_fds)
+{
+  int i;
+  int n = connection_list.size();
+
+  FD_ZERO(read_fds);
+  FD_SET(STDIN_FILENO, read_fds);
+  FD_SET(serverSd, read_fds);
+  for (i = 0; i < n; ++i)
+    if (connection_list[i]->socket != NO_SOCKET)
+      FD_SET(connection_list[i]->socket, read_fds);
+
+  FD_ZERO(write_fds);
+  for (i = 0; i < n; ++i)
+    if (connection_list[i]->socket != NO_SOCKET && connection_list[i]->send_buffer->current > 0)
+      FD_SET(connection_list[i]->socket, write_fds);
+
+  FD_ZERO(except_fds);
+  FD_SET(STDIN_FILENO, except_fds);
+  FD_SET(serverSd, except_fds);
+  for (i = 0; i < n; ++i)
+    if (connection_list[i]->socket != NO_SOCKET)
+      FD_SET(connection_list[i]->socket, except_fds);
+
+  return 0;
 }
 
 void WIN_SOCKET::sendFromServer(std::string data)

@@ -10,8 +10,7 @@
 //============================================================================
 #ifndef WIN_HTTP_H
 #define WIN_HTTP_H
-#define _WIN32
-#ifdef _WIN32 true
+#if defined _WIN32
 
 #include <cstring>       // strlen
 #include <iostream>

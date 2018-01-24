@@ -22,14 +22,32 @@
 #include <stdexcept>     // std::runtime_error
 #include <functional>
 #include <chrono>
+#include <vector>
 
 /* windows sock */
 #define _WIN32_WINNT 0x6000 // getaddrinfo and freeaddrinfo
 #include <winsock2.h>
 #include <ws2tcpip.h> // getaddrinfo
 
-
 #define BUFFER_SIZE 1024
+#define NO_SOCKET -1
+
+class message_queue_t
+{
+public:
+	int current;
+};
+
+class peer_t
+{
+public:
+	int socket;
+	sockaddr_in addres;
+	int current_sending_byte;
+	int current_receiving_byte;
+	message_queue_t* send_buffer;
+
+};
 
 /**
  @class WinHTTP
@@ -45,6 +63,10 @@ private:
 	bool listenFlag;
 	std::string host;
 	u_short port;
+	std::vector<peer_t*> connection_list;
+	fd_set read_fds;
+	fd_set write_fds;
+	fd_set except_fds;
 
 public:
 	WIN_SOCKET(int port);
@@ -54,6 +76,7 @@ public:
 	void sockBind();
 	void sockListen(std::function<void(WIN_SOCKET*)>* listenCB);
 	void sockLoop(std::function<void(WIN_SOCKET*)>* listenCB);
+	int build_fd_sets(fd_set *read_fds, fd_set *write_fds, fd_set *except_fds);
 	void sendFromServer(std::string data);
 };
 
