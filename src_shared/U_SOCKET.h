@@ -52,6 +52,7 @@ public:
 	void sockBind();
 	void sockListen(std::function<void(U_SOCKET*)>* listenCB);
 	void sockLoop(std::function<void(U_SOCKET*)>* listenCB);
+	void stdinListen(std::string str);
 	void sendFromServer(std::string data);
 };
 

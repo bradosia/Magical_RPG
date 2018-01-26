@@ -52,6 +52,11 @@ void U_SOCKET::sockLoop(std::function<void(U_SOCKET*)>* listenCB)
 	sockObjPtr->sockLoop(&listenCB2);
 }
 
+void U_SOCKET::stdinListen(std::string str)
+{
+	sockObjPtr->stdinListen(str);
+}
+
 void U_SOCKET::sendFromServer(std::string data){
 	sockObjPtr->sendFromServer(data);
 }

@@ -139,6 +139,8 @@ public:
 	int handle_read_from_stdin();
 	int handle_received_message(message_t *message);
 
+	void stdinListen(std::string str);
+
 	void sendFromServer(std::string data);
 };
 

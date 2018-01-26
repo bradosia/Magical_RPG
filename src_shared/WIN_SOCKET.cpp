@@ -188,24 +188,24 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 		switch (activity)
 		{
 		case -1:
-			perror("select()");
+			//perror("select()");
 			//shutdown_properly(EXIT_FAILURE);
 
 		case 0:
 			// you should never get here
-			printf("select() returns 0.\n");
+			//printf("select() returns 0.\n");
 			//shutdown_properly(EXIT_FAILURE);
 
 		default:
 			/* All set fds should be checked. */
 			/*if (FD_ISSET(STDIN_FILENO, &read_fds))
-			 {
-			 std::cout << "STDIN_FILENO\n";
-			 if (handle_read_from_stdin() != 0)
-			 {
-			 //shutdown_properly(EXIT_FAILURE);
-			 }
-			 }*/
+			{
+				std::cout << "STDIN_FILENO\n";
+				if (handle_read_from_stdin() != 0)
+				 {
+				 //shutdown_properly(EXIT_FAILURE);
+				 }
+			}*/
 
 			if (FD_ISSET(serverSd, &read_fds))
 			{
@@ -215,19 +215,21 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 
 			if (FD_ISSET(STDIN_FILENO, &except_fds))
 			{
-				printf("except_fds for stdin.\n");
+				//printf("except_fds for stdin.\n");
 				//shutdown_properly(EXIT_FAILURE);
 			}
 
 			if (FD_ISSET(serverSd, &except_fds))
 			{
-				printf("Exception listen socket fd.\n");
+				//printf("Exception listen socket fd.\n");
 				//shutdown_properly(EXIT_FAILURE);
 			}
 
+			//std::cout << "connections...\n";
 			n = connection_list.size();
 			for (i = 0; i < n; ++i)
 			{
+				//std::cout << "socket: " << i << std::endl;
 				if (connection_list[i]->socket != NO_SOCKET
 						&& FD_ISSET(connection_list[i]->socket, &read_fds))
 				{
@@ -261,8 +263,8 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 			}
 		}
 
-		std::cout
-				<< "And we are still waiting for clients' or stdin activity. You can type something to send:\n";
+		/*std::cout
+				<< "And we are still waiting for clients' or stdin activity. You can type something to send:\n";*/
 
 		//receive a message from the client (listen)
 		/*std::cout << "Awaiting client response..." << std::endl;
@@ -628,7 +630,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 	int n = connection_list.size();
 
 	FD_ZERO(read_fds);
-	FD_SET(STDIN_FILENO, read_fds);
+	//FD_SET(STDIN_FILENO, read_fds);
 	FD_SET(serverSd, read_fds);
 	for (i = 0; i < n; ++i)
 		if (connection_list[i]->socket != NO_SOCKET)
@@ -641,7 +643,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 			FD_SET(connection_list[i]->socket, write_fds);
 
 	FD_ZERO(except_fds);
-	FD_SET(STDIN_FILENO, except_fds);
+	//FD_SET(STDIN_FILENO, except_fds);
 	FD_SET(serverSd, except_fds);
 	for (i = 0; i < n; ++i)
 		if (connection_list[i]->socket != NO_SOCKET)
@@ -655,8 +657,10 @@ int WIN_SOCKET::handle_new_connection()
 	sockaddr_in client_addr;
 	memset(&client_addr, 0, sizeof(client_addr));
 	socklen_t client_len = sizeof(client_addr);
+	std::cout << "accept..." << std::endl;
 	int new_client_sock = accept(serverSd, (struct sockaddr *) &client_addr,
 			&client_len);
+	std::cout << "accept...DONE" << std::endl;
 	if (new_client_sock < 0)
 	{
 		perror("accept()");
@@ -741,6 +745,11 @@ int WIN_SOCKET::handle_received_message(message_t *message)
 	printf("Received message from client.\n");
 	print_message(message);
 	return 0;
+}
+
+void WIN_SOCKET::stdinListen(std::string str)
+{
+	std::cout << "got: " << str << std::endl;
 }
 
 void WIN_SOCKET::sendFromServer(std::string data)

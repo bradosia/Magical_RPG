@@ -12,8 +12,22 @@
 #include <iostream>
 #include <string>
 #include <functional>
+
+/* threads */
+#if defined _WIN32
+#undef _GLIBCXX_HAS_GTHREADS
+#include "../src_shared/include/mingw.thread.h"
+#include <mutex>
+#include "../src_shared/include/mingw.mutex.h"
+#include "../src_shared/include/mingw.condition_variable.h"
+#include <atomic>
+#include <assert.h>
+#endif
+
+#include "../src_shared/stdin_thread.h"
 #include "../src_shared/U_SOCKET.h"
 
+void serverConnect(U_SOCKET* socketServer);
 void listenCB(U_SOCKET* socketServer);
 
 int main()
@@ -23,16 +37,33 @@ int main()
 	{
 		socketServer = new U_SOCKET(9573);
 		socketServer->sockSetup();
-		std::cout << "Binding..." << std::endl;
-		socketServer->sockBind();
-		std::cout << "Listening..." << std::endl;
-		socketServer->sockListen(
-				new std::function<void(U_SOCKET*)>(&listenCB));
 	} catch (const std::exception& e)
 	{
 		std::cout << "Error: " << e.what() << std::endl;
 	}
+
+	std::function<void(std::string)> CB = [&socketServer](std::string str)
+	{	socketServer->stdinListen(str);};
+	std::thread first(serverConnect, socketServer);
+	std::thread second(stdinListen, &CB);
+	while(1){
+		//nothing
+	}
 	return 0;
+}
+
+void serverConnect(U_SOCKET* socketServer)
+{
+	try
+	{
+		std::cout << "Binding..." << std::endl;
+		socketServer->sockBind();
+		std::cout << "Listening..." << std::endl;
+		socketServer->sockListen(new std::function<void(U_SOCKET*)>(&listenCB));
+	} catch (const std::exception& e)
+	{
+		std::cout << "Error: " << e.what() << std::endl;
+	}
 }
 
 void listenCB(U_SOCKET* socketServer)
