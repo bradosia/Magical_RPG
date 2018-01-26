@@ -16,6 +16,7 @@
 #include <string>
 #include <functional>
 /* threads */
+#if defined _WIN32
 #undef _GLIBCXX_HAS_GTHREADS
 #include "../src_shared/include/mingw.thread.h"
 #include <mutex>
@@ -23,6 +24,7 @@
 #include "../src_shared/include/mingw.condition_variable.h"
 #include <atomic>
 #include <assert.h>
+#endif
 
 #include "../src_shared/U_SOCKET.h"
 #include "globals.h"

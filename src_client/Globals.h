@@ -8,7 +8,9 @@
 
 #include <iostream>
 #include <typeinfo>
+#if defined _WIN32
 #include <windef.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
