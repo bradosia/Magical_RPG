@@ -106,8 +106,6 @@ private:
 	fd_set except_fds;
 
 public:
-	typedef void (WIN_SOCKET::*WIN_SOCKET_FN)(int code);
-
 	WIN_SOCKET(int port);
 	WIN_SOCKET(std::string host_, int port);
 	void sockSetup();
