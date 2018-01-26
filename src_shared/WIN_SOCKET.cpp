@@ -125,7 +125,9 @@ void WIN_SOCKET::sockBind()
 	}
 }
 
-void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
+void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* conCB,
+		std::function<void(WIN_SOCKET*)>* dconCB,
+		std::function<void(WIN_SOCKET*)>* rcvCB)
 {
 	//listen for up to 5 requests at a time
 	listen(serverSd, 5);
@@ -199,18 +201,19 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 		default:
 			/* All set fds should be checked. */
 			/*if (FD_ISSET(STDIN_FILENO, &read_fds))
-			{
-				std::cout << "STDIN_FILENO\n";
-				if (handle_read_from_stdin() != 0)
-				 {
-				 //shutdown_properly(EXIT_FAILURE);
-				 }
-			}*/
+			 {
+			 std::cout << "STDIN_FILENO\n";
+			 if (handle_read_from_stdin() != 0)
+			 {
+			 //shutdown_properly(EXIT_FAILURE);
+			 }
+			 }*/
 
 			if (FD_ISSET(serverSd, &read_fds))
 			{
 				std::cout << "handle\n";
 				handle_new_connection();
+				(*conCB)(this);
 			}
 
 			if (FD_ISSET(STDIN_FILENO, &except_fds))
@@ -233,10 +236,31 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 				if (connection_list[i]->socket != NO_SOCKET
 						&& FD_ISSET(connection_list[i]->socket, &read_fds))
 				{
+
+					u_long iMode = 1;
+					int iResult = ioctlsocket(connection_list[i]->socket,
+					FIONREAD, &iMode);
+					if (iResult != NO_ERROR)
+					{
+						printf("ioctlsocket failed with error: %d\n", iResult);
+					}
+					if (iMode == 0)
+					{
+						std::cout << "Client Disconnected: #"
+								<< connection_list[i]->socket << std::endl;
+						close_client_connection(connection_list[i]);
+						(*dconCB)(this);
+						continue;
+					}
+
 					std::function<int(message_t*)> CB = std::bind(
 							&WIN_SOCKET::handle_received_message, this,
 							std::placeholders::_1);
-					if (receive_from_peer(connection_list[i], &CB) != 0)
+					if (receive_from_peer(connection_list[i], &CB) == 0)
+					{
+						(*rcvCB)(this);
+					}
+					else
 					{
 						close_client_connection(connection_list[i]);
 						continue;
@@ -264,7 +288,7 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* listenCB)
 		}
 
 		/*std::cout
-				<< "And we are still waiting for clients' or stdin activity. You can type something to send:\n";*/
+		 << "And we are still waiting for clients' or stdin activity. You can type something to send:\n";*/
 
 		//receive a message from the client (listen)
 		/*std::cout << "Awaiting client response..." << std::endl;
@@ -456,7 +480,7 @@ int WIN_SOCKET::receive_from_peer(peer_t *peer,
 		if (len_to_receive > MAX_SEND_SIZE)
 			len_to_receive = MAX_SEND_SIZE;
 
-		printf("Let's try to recv() %zd bytes... ", len_to_receive);
+		std::cout << "try to recv() bytes: " << len_to_receive << std::endl;
 		received_count = recv(peer->socket,
 				(char *) &peer->receiving_buffer + peer->current_receiving_byte,
 				len_to_receive, MSG_DONTWAIT);
@@ -469,7 +493,8 @@ int WIN_SOCKET::receive_from_peer(peer_t *peer,
 			else
 			{
 				perror("recv() from peer error");
-				return -1;
+				//return -1;
+				break;
 			}
 		}
 		else if (received_count < 0
@@ -487,7 +512,7 @@ int WIN_SOCKET::receive_from_peer(peer_t *peer,
 		{
 			peer->current_receiving_byte += received_count;
 			received_total += received_count;
-			printf("recv() %zd bytes\n", received_count);
+			std::cout << "recv() bytes: " << received_count << std::endl;
 		}
 	} while (received_count > 0);
 
@@ -689,6 +714,13 @@ int WIN_SOCKET::handle_new_connection()
 	newPeer->current_sending_byte = -1;
 	newPeer->current_receiving_byte = 0;
 	connection_list.push_back(newPeer);
+
+	u_long iMode = 1;
+	int iResult = ioctlsocket(new_client_sock, FIONBIO, &iMode);
+	if (iResult != NO_ERROR)
+	{
+		printf("ioctlsocket failed with error: %d\n", iResult);
+	}
 
 	return 0;
 

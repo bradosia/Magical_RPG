@@ -40,10 +40,12 @@ void U_SOCKET::sockBind()
 	sockObjPtr->sockBind();
 }
 
-void U_SOCKET::sockListen(std::function<void(U_SOCKET*)>* listenCB)
+void U_SOCKET::sockListen(std::function<void(U_SOCKET*)>* conCB, std::function<void(U_SOCKET*)>* dconCB, std::function<void(U_SOCKET*)>* rcvCB)
 {
-	std::function<void(UU_SOCKET*)> listenCB2 = [&listenCB](UU_SOCKET *sock_){(*listenCB)(new U_SOCKET(sock_));};
-	sockObjPtr->sockListen(&listenCB2);
+	std::function<void(UU_SOCKET*)> conCBF = [&conCB](UU_SOCKET *sock_){(*conCB)(new U_SOCKET(sock_));};
+	std::function<void(UU_SOCKET*)> dconCBF = [&dconCB](UU_SOCKET *sock_){(*dconCB)(new U_SOCKET(sock_));};
+	std::function<void(UU_SOCKET*)> rcvCBF = [&rcvCB](UU_SOCKET *sock_){(*rcvCB)(new U_SOCKET(sock_));};
+	sockObjPtr->sockListen(&conCBF, &dconCBF, &rcvCBF);
 }
 
 void U_SOCKET::sockLoop(std::function<void(U_SOCKET*)>* listenCB)

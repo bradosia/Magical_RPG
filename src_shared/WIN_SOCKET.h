@@ -111,7 +111,7 @@ public:
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
-	void sockListen(std::function<void(WIN_SOCKET*)>* listenCB);
+	void sockListen(std::function<void(WIN_SOCKET*)>* conCB, std::function<void(WIN_SOCKET*)>* dconCB, std::function<void(WIN_SOCKET*)>* rcvCB);
 	void sockLoop(std::function<void(WIN_SOCKET*)>* listenCB);
 	// message --------------------------------------------------------------------
 	int prepare_message(char *sender, char *data, message_t *message);

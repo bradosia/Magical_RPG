@@ -23,12 +23,15 @@
 #include <atomic>
 #include <assert.h>
 #endif
+/* threads end */
 
 #include "../src_shared/stdin_thread.h"
 #include "../src_shared/U_SOCKET.h"
 
-void serverConnect(U_SOCKET* socketServer);
-void listenCB(U_SOCKET* socketServer);
+void socketLoop(U_SOCKET* socketServer);
+void conCB(U_SOCKET* socketServer);
+void dconCB(U_SOCKET* socketServer);
+void rcvCB(U_SOCKET* socketServer);
 
 int main()
 {
@@ -44,29 +47,43 @@ int main()
 
 	std::function<void(std::string)> CB = [&socketServer](std::string str)
 	{	socketServer->stdinListen(str);};
-	std::thread first(serverConnect, socketServer);
+	std::thread first(socketLoop, socketServer);
 	std::thread second(stdinListen, &CB);
-	while(1){
-		//nothing
+	while (1)
+	{
+		/* do timed events and scheduled send() here */
 	}
 	return 0;
 }
 
-void serverConnect(U_SOCKET* socketServer)
+void socketLoop(U_SOCKET* socketServer)
 {
 	try
 	{
 		std::cout << "Binding..." << std::endl;
 		socketServer->sockBind();
 		std::cout << "Listening..." << std::endl;
-		socketServer->sockListen(new std::function<void(U_SOCKET*)>(&listenCB));
+		std::function<void(U_SOCKET*)>* conCBF =new std::function<void(U_SOCKET*)>(&conCB);
+		std::function<void(U_SOCKET*)>* dconCBF =new std::function<void(U_SOCKET*)>(&dconCB);
+		std::function<void(U_SOCKET*)>* rcvCBF =new std::function<void(U_SOCKET*)>(&rcvCB);
+		socketServer->sockListen(conCBF, dconCBF, rcvCBF);
 	} catch (const std::exception& e)
 	{
 		std::cout << "Error: " << e.what() << std::endl;
 	}
 }
 
-void listenCB(U_SOCKET* socketServer)
+void conCB(U_SOCKET* socketServer)
 {
+	std::cout << "Client Connected!" << std::endl;
+}
 
+void dconCB(U_SOCKET* socketServer)
+{
+	std::cout << "Client Disonnected!" << std::endl;
+}
+
+void rcvCB(U_SOCKET* socketServer)
+{
+	std::cout << "Client Data Received!" << std::endl;
 }
