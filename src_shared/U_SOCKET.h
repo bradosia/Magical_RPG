@@ -29,7 +29,7 @@
 #define UU_SOCKET WIN_SOCKET
 #elif defined __APPLE__
 #include "APPLE_SOCKET.h"
-#define UU_HTTP APPLE_SOCKET
+#define UU_SOCKET APPLE_SOCKET
 #endif
 
 #define BUFFER_SIZE 1024

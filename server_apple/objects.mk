@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lws2_32
+LIBS :=
 

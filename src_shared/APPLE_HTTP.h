@@ -8,9 +8,10 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#ifndef POSIX_HTTP_H
-#define POSIX_HTTP_H
+#ifndef APPLE_HTTP_H
+#define APPLE_HTTP_H
 #if defined __APPLE__
+
 #include <cstring>       // strlen
 #include <iostream>
 #include <locale>
@@ -19,10 +20,16 @@
 #include <fstream>
 #include <stdexcept>     // std::runtime_error
 #include <functional>
-#include <string.h>
+#include <chrono>
+#include <vector>
+#include <signal.h>
+//#include <io.h>
+
+// apple specific
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>      // close()
@@ -31,6 +38,7 @@
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+// apple end
 
 #define BUFFER_SIZE 1024
 

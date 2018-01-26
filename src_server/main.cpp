@@ -22,6 +22,8 @@
 #include "../src_shared/include/mingw.condition_variable.h"
 #include <atomic>
 #include <assert.h>
+#else
+#include <thread>
 #endif
 /* threads end */
 

@@ -8,15 +8,15 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "POSIX_HTTP.h"
-#ifdef __linux__
+#include "APPLE_HTTP.h"
+#ifdef __APPLE__
 
-POSIX_HTTP::POSIX_HTTP()
+APPLE_HTTP::APPLE_HTTP()
 {
 
 }
 
-int POSIX_HTTP::socket_connect(char *host, int port_)
+int APPLE_HTTP::socket_connect(char *host, int port_)
 {
 	int on = 1, sock;
 	in_port_t port = (in_port_t) port_;
@@ -47,7 +47,7 @@ int POSIX_HTTP::socket_connect(char *host, int port_)
 	return sock;
 }
 
-std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
+std::string APPLE_HTTP::getWebsite(std::string url, std::string path)
 {
 	int fd;
 	char buffer[BUFFER_SIZE];
@@ -84,7 +84,7 @@ std::string POSIX_HTTP::getWebsite(std::string url, std::string path)
 	return response;
 }
 
-std::string POSIX_HTTP::html(std::string response)
+std::string APPLE_HTTP::html(std::string response)
 {
 	return response.substr(response.find("\r\n\r\n") + 4);
 }
