@@ -125,9 +125,7 @@ void WIN_SOCKET::sockBind()
 	}
 }
 
-void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* conCB,
-		std::function<void(WIN_SOCKET*)>* dconCB,
-		std::function<void(WIN_SOCKET*)>* rcvCB)
+void WIN_SOCKET::sockListen()
 {
 	//listen for up to 5 requests at a time
 	listen(serverSd, 5);
@@ -150,140 +148,89 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* conCB,
 	//also keep track of the amount of data sent as well
 	int bytesRead, bytesWritten = 0;
 	char msg[1500];
-
-	/* Set nonblock for stdin. */
-	/*u_long iMode = 1;
-	 int iResult = ioctlsocket(STDIN_FILENO, FIONBIO, &iMode);
-	 if (iResult != NO_ERROR)
-	 {
-	 printf("ioctlsocket failed with error: %d\n", iResult);
-	 }*/
-	/*int iResult = fcntl(STDIN_FILENO, F_GETFL, 0);
-	 flag |= O_NONBLOCK;
-	 fcntl(STDIN_FILENO, F_SETFL, flag);*/
-
-	int i;
-	int n = connection_list.size();
-	for (i = 0; i < n; ++i)
-	{
-		connection_list[i]->socket = NO_SOCKET;
-		create_peer(connection_list[i]);
-	}
-
-	int high_sock = serverSd;
+	int sockNum = 0;
+	int nfds = serverSd;
+	int i = 0;
+	int n = 0;
+	int activity = 0;
 	while (listenFlag)
 	{
-		std::cout << "loop\n";
+		(*loopCB)(this, 0);
 		build_fd_sets(&read_fds, &write_fds, &except_fds);
-
-		high_sock = serverSd;
+		/* linux only: nfds should be set to the highest-numbered file descriptor in any of the three sets, plus 1. */
+		nfds = serverSd;
 		n = connection_list.size();
 		for (i = 0; i < n; ++i)
 		{
-			if (connection_list[i]->socket > high_sock)
-				high_sock = connection_list[i]->socket;
+			if (connection_list[i]->socket > nfds)
+				nfds = connection_list[i]->socket;
 		}
 
-		int activity = select(high_sock + 1, &read_fds, &write_fds, &except_fds,
+		activity = select(nfds + 1, &read_fds, &write_fds, &except_fds,
 		NULL);
-
-		switch (activity)
+		if (activity == 0)
 		{
-		case -1:
-			//perror("select()");
-			//shutdown_properly(EXIT_FAILURE);
+			(*errCB)(this, 0);
+		}
+		else if (activity == -1)
+		{
+			(*errCB)(this, 0);
+		}
 
-		case 0:
-			// you should never get here
-			//printf("select() returns 0.\n");
-			//shutdown_properly(EXIT_FAILURE);
+		if (sockCon(sockNum) == 0)
+		{
+			(*conCB)(this, sockNum);
+		}
 
-		default:
-			/* All set fds should be checked. */
-			/*if (FD_ISSET(STDIN_FILENO, &read_fds))
-			 {
-			 std::cout << "STDIN_FILENO\n";
-			 if (handle_read_from_stdin() != 0)
-			 {
-			 //shutdown_properly(EXIT_FAILURE);
-			 }
-			 }*/
+		if (sockDcon(sockNum) == 0)
+		{
+			(*dconCB)(this, sockNum);
+		}
 
-			if (FD_ISSET(serverSd, &read_fds))
+		if (FD_ISSET(serverSd, &except_fds))
+		{
+			(*errCB)(this, 0);
+		}
+
+		//std::cout << "connections...\n";
+		n = connection_list.size();
+		for (i = 0; i < n; ++i)
+		{
+			//std::cout << "socket: " << i << std::endl;
+			if (connection_list[i]->socket != NO_SOCKET
+					&& FD_ISSET(connection_list[i]->socket, &read_fds))
 			{
-				std::cout << "handle\n";
-				handle_new_connection();
-				(*conCB)(this);
-			}
 
-			if (FD_ISSET(STDIN_FILENO, &except_fds))
-			{
-				//printf("except_fds for stdin.\n");
-				//shutdown_properly(EXIT_FAILURE);
-			}
-
-			if (FD_ISSET(serverSd, &except_fds))
-			{
-				//printf("Exception listen socket fd.\n");
-				//shutdown_properly(EXIT_FAILURE);
-			}
-
-			//std::cout << "connections...\n";
-			n = connection_list.size();
-			for (i = 0; i < n; ++i)
-			{
-				//std::cout << "socket: " << i << std::endl;
-				if (connection_list[i]->socket != NO_SOCKET
-						&& FD_ISSET(connection_list[i]->socket, &read_fds))
+				std::function<int(message_t*)> CB = std::bind(
+						&WIN_SOCKET::handle_received_message, this,
+						std::placeholders::_1);
+				if (receive_from_peer(connection_list[i], &CB) == 0)
 				{
-
-					u_long iMode = 1;
-					int iResult = ioctlsocket(connection_list[i]->socket,
-					FIONREAD, &iMode);
-					if (iResult != NO_ERROR)
-					{
-						printf("ioctlsocket failed with error: %d\n", iResult);
-					}
-					if (iMode == 0)
-					{
-						std::cout << "Client Disconnected: #"
-								<< connection_list[i]->socket << std::endl;
-						close_client_connection(connection_list[i]);
-						(*dconCB)(this);
-						continue;
-					}
-
-					std::function<int(message_t*)> CB = std::bind(
-							&WIN_SOCKET::handle_received_message, this,
-							std::placeholders::_1);
-					if (receive_from_peer(connection_list[i], &CB) == 0)
-					{
-						(*rcvCB)(this);
-					}
-					else
-					{
-						close_client_connection(connection_list[i]);
-						continue;
-					}
+					(*rcvCB)(this, i);
 				}
-
-				if (connection_list[i]->socket != NO_SOCKET
-						&& FD_ISSET(connection_list[i]->socket, &write_fds))
+				else
 				{
-					if (send_to_peer(connection_list[i]) != 0)
-					{
-						close_client_connection(connection_list[i]);
-						continue;
-					}
-				}
-
-				if (connection_list[i]->socket != NO_SOCKET
-						&& FD_ISSET(connection_list[i]->socket, &except_fds))
-				{
-					printf("Exception client fd.\n");
 					close_client_connection(connection_list[i]);
 					continue;
 				}
+			}
+
+			if (connection_list[i]->socket != NO_SOCKET
+					&& FD_ISSET(connection_list[i]->socket, &write_fds))
+			{
+				if (send_to_peer(connection_list[i]) != 0)
+				{
+					close_client_connection(connection_list[i]);
+					continue;
+				}
+			}
+
+			if (connection_list[i]->socket != NO_SOCKET
+					&& FD_ISSET(connection_list[i]->socket, &except_fds))
+			{
+				printf("Exception client fd.\n");
+				close_client_connection(connection_list[i]);
+				continue;
 			}
 		}
 
@@ -313,11 +260,11 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* conCB,
 		 sendFromServer(data);*/
 		//(*listenCB)(this);
 	}
-	//we need to close the socket descriptors after we're all done
+//we need to close the socket descriptors after we're all done
 	/*t2 = std::chrono::system_clock::now();
 	 elapsedTime = (int) std::chrono::duration_cast < std::chrono::seconds
 	 > (t2 - t1).count();*/
-	//closesocket(acceptSd);
+//closesocket(acceptSd);
 	closesocket(serverSd);
 	std::cout << "********Session********" << std::endl;
 	std::cout << "Bytes written: " << bytesWritten << " Bytes read: "
@@ -326,12 +273,12 @@ void WIN_SOCKET::sockListen(std::function<void(WIN_SOCKET*)>* conCB,
 	std::cout << "Connection closed..." << std::endl;
 }
 
-void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
+void WIN_SOCKET::sockLoop()
 {
 	int bytesRead, bytesWritten = 0;
-	//std::chrono::system_clock::time_point t1, t2;
+//std::chrono::system_clock::time_point t1, t2;
 	unsigned int elapsedTime = 0;
-	//t1 = std::chrono::system_clock::now();
+//t1 = std::chrono::system_clock::now();
 	char msg[1500];
 	while (1)
 	{
@@ -355,7 +302,7 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 			break;
 		}
 		std::cout << "Server: " << msg << std::endl;
-		(*listenCB)(this);
+		//(*listenCB)(this);
 	}
 	/*t2 = std::chrono::system_clock::now();
 	 elapsedTime = (int) std::chrono::duration_cast < std::chrono::seconds
@@ -366,6 +313,65 @@ void WIN_SOCKET::sockLoop(std::function<void(WIN_SOCKET*)>* listenCB)
 			<< bytesRead << std::endl;
 	std::cout << "Elapsed time: " << elapsedTime << " secs" << std::endl;
 	std::cout << "Connection closed" << std::endl;
+}
+
+void WIN_SOCKET::on(std::string event,
+		std::function<void(WIN_SOCKET*, int)>* CB)
+{
+	if (event == "connect")
+	{
+		conCB = CB;
+	}
+	else if (event == "end")
+	{
+		dconCB = CB;
+	}
+	else if (event == "error")
+	{
+		errCB = CB;
+	}
+	else if (event == "data")
+	{
+		rcvCB = CB;
+	}
+	else if (event == "loop")
+	{
+		loopCB = CB;
+	}
+}
+
+int WIN_SOCKET::sockCon(int &sockNum)
+{
+	if (FD_ISSET(serverSd, &read_fds))
+	{
+		return handle_new_connection(sockNum);
+	}
+}
+
+int WIN_SOCKET::sockDcon(int &sockNum)
+{
+	int i;
+	int n = connection_list.size();
+	u_long iMode;
+	int err = 0;
+	for (i = 0; i < n; ++i)
+	{
+		if (FD_ISSET(connection_list[i]->socket, &read_fds))
+		{
+			iMode = 1;
+			int iResult = ioctlsocket(connection_list[i]->socket,
+			FIONREAD, &iMode);
+			if (iResult != NO_ERROR)
+			{
+				err++;
+			}
+			if (iMode == 0)
+			{
+				close_client_connection(connection_list[i]);
+			}
+		}
+	}
+	return err;
 }
 
 int WIN_SOCKET::prepare_message(char *sender, char *data, message_t *message)
@@ -655,7 +661,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 	int n = connection_list.size();
 
 	FD_ZERO(read_fds);
-	//FD_SET(STDIN_FILENO, read_fds);
+//FD_SET(STDIN_FILENO, read_fds);
 	FD_SET(serverSd, read_fds);
 	for (i = 0; i < n; ++i)
 		if (connection_list[i]->socket != NO_SOCKET)
@@ -668,7 +674,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 			FD_SET(connection_list[i]->socket, write_fds);
 
 	FD_ZERO(except_fds);
-	//FD_SET(STDIN_FILENO, except_fds);
+//FD_SET(STDIN_FILENO, except_fds);
 	FD_SET(serverSd, except_fds);
 	for (i = 0; i < n; ++i)
 		if (connection_list[i]->socket != NO_SOCKET)
@@ -677,7 +683,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 	return 0;
 }
 
-int WIN_SOCKET::handle_new_connection()
+int WIN_SOCKET::handle_new_connection(int &sockNum)
 {
 	sockaddr_in client_addr;
 	memset(&client_addr, 0, sizeof(client_addr));
@@ -700,9 +706,9 @@ int WIN_SOCKET::handle_new_connection()
 	{
 		strcpy(client_ipv4_str, "error");
 	}
-	//inet_ntop(AF_INET, &client_addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
+//inet_ntop(AF_INET, &client_addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
 
-	//std::cout << "client_addr.sin_addr = " << client_addr.sin_addr << std::endl;
+//std::cout << "client_addr.sin_addr = " << client_addr.sin_addr << std::endl;
 	printf("Incoming connection from %s:%d.\n", client_ipv4_str,
 			client_addr.sin_port);
 
@@ -748,7 +754,7 @@ int WIN_SOCKET::handle_read_from_stdin()
 	if (read_from_stdin(read_buffer, DATA_MAXSIZE) != 0)
 		return -1;
 
-	// Create new message and enqueue it.
+// Create new message and enqueue it.
 	message_t new_message;
 	prepare_message("Server", read_buffer, &new_message);
 	print_message(&new_message);

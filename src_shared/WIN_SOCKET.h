@@ -52,20 +52,23 @@
 #define EAGAIN          11      /* Try again */
 #define EWOULDBLOCK     EAGAIN  /* Operation would block */
 
-class message_t {
+class message_t
+{
 public:
 	char sender[SENDER_MAXSIZE];
 	char data[DATA_MAXSIZE];
 };
 
-class message_queue_t {
+class message_queue_t
+{
 public:
 	int size;
 	message_t *data;
 	int current;
 };
 
-class peer_t {
+class peer_t
+{
 public:
 	int socket;
 	sockaddr_in addres;
@@ -92,7 +95,8 @@ public:
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class WIN_SOCKET {
+class WIN_SOCKET
+{
 private:
 	sockaddr_in servAddr;
 	int serverSd;
@@ -104,15 +108,50 @@ private:
 	fd_set read_fds;
 	fd_set write_fds;
 	fd_set except_fds;
+	std::function<void(WIN_SOCKET*, int)>* conCB;
+	std::function<void(WIN_SOCKET*, int)>* dconCB;
+	std::function<void(WIN_SOCKET*, int)>* rcvCB;
+	std::function<void(WIN_SOCKET*, int)>* errCB;
+	std::function<void(WIN_SOCKET*, int)>* loopCB;
 
 public:
 	WIN_SOCKET(int port);
 	WIN_SOCKET(std::string host_, int port);
+	// socket connections
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
-	void sockListen(std::function<void(WIN_SOCKET*)>* conCB, std::function<void(WIN_SOCKET*)>* dconCB, std::function<void(WIN_SOCKET*)>* rcvCB);
-	void sockLoop(std::function<void(WIN_SOCKET*)>* listenCB);
+	void sockListen();
+	void sockLoop();
+	void on(std::string event, std::function<void(WIN_SOCKET*, int)>* CB);
+	/** Checks and handles socket connection
+	 @pre None
+	 @post None
+	 @param sockNum socket number connected, unchanged if not connected
+	 @return 0 on success, error code on failure
+	 */
+	int sockCon(int &sockNum);
+	/** Checks and handles socket disconnection
+	 @pre None
+	 @post None
+	 @param sockNum socket number disconnected, unchanged if not disconnected
+	 @return 0 on success, error code on failure
+	 */
+	int sockDcon(int &sockNum);
+	/** Checks and handles socket error
+	 @pre None
+	 @post None
+	 @param sockNum socket number disconnected, unchanged if not disconnected
+	 @return 0 on success, error code on failure
+	 */
+	int sockError(int &sockNum);
+	/** Checks and handles socket receive
+	 @pre None
+	 @post None
+	 @param sockNum socket number disconnected, unchanged if not disconnected
+	 @return 0 on success, error code on failure
+	 */
+	int sockRcv(int &sockNum);
 	// message --------------------------------------------------------------------
 	int prepare_message(char *sender, char *data, message_t *message);
 	int print_message(message_t *message);
@@ -134,7 +173,7 @@ public:
 
 	void shutdown_properly(int code);
 	int build_fd_sets(fd_set *read_fds, fd_set *write_fds, fd_set *except_fds);
-	int handle_new_connection();
+	int handle_new_connection(int &sockNum);
 	int close_client_connection(peer_t *client);
 	int handle_read_from_stdin();
 	int handle_received_message(message_t *message);
@@ -146,7 +185,8 @@ public:
 
 typedef void (WIN_SOCKET::*WIN_SOCKET_FN)(int code);
 
-class signalHandle {
+class signalHandle
+{
 private:
 	static bool cb_flag;
 	static WIN_SOCKET o;

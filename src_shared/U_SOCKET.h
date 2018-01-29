@@ -50,8 +50,9 @@ public:
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
-	void sockListen(std::function<void(U_SOCKET*)>* conCB, std::function<void(U_SOCKET*)>* dconCB, std::function<void(U_SOCKET*)>* rcvCB);
-	void sockLoop(std::function<void(U_SOCKET*)>* listenCB);
+	void sockListen();
+	void sockLoop();
+	void on(std::string event, std::function<void(U_SOCKET*, int)>* CB);
 	void stdinListen(std::string str);
 	void sendFromServer(std::string data);
 };
