@@ -82,14 +82,14 @@ void init(int argc, char** argv) {
 	pos_y = (res_y >> 1) - (GAME_HEIGHT >> 1);
 
 	glutInitWindowPosition(pos_x, pos_y);
-	//glutInitWindowSize(GAME_WIDTH, GAME_HEIGHT);
-	glutInitWindowSize(512, 288);
+	glutInitWindowSize(GAME_WIDTH, GAME_HEIGHT);
+	//glutInitWindowSize(512, 288);
 
 	glutCreateWindow(projectName.c_str());
 	//XWIN::find(NULL, projectName); //get the window handler
 
-	/*glutGameModeString("800x600:32");
-	 glutEnterGameMode();*/
+	glutGameModeString("800x600:32");
+	//glutEnterGameMode();
 
 	//Make the default cursor disappear
 	//glutSetCursor(GLUT_CURSOR_NONE);
@@ -126,10 +126,10 @@ int main(int argc, char** argv) {
 
 #if PRODUCTION && defined _WIN
 INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-    PSTR lpCmdLine, INT nCmdShow)
+		PSTR lpCmdLine, INT nCmdShow)
 {
 	init(0, 0);
-    return 0;
+	return 0;
 }
 #endif
 
@@ -147,7 +147,7 @@ void serverConnect() {
 		std::cout << "Connecting..." << std::endl;
 		socketServer->sockConnect();
 		std::cout << "Looping..." << std::endl;
-		socketServer->sockLoop(new std::function<void(U_SOCKET*)>(&listenCB));
+		//socketServer->sockLoop(new std::function<void(U_SOCKET*)>(&listenCB));
 	} catch (const std::exception& e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
