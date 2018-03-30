@@ -26,14 +26,13 @@
 #include <assert.h>
 #endif
 
+#include "../src_shared/stdin_thread.h"
 #include "../src_shared/U_SOCKET.h"
 #include "globals.h"
 #include "cGame.h"
 
-void stdinListen(std::function<void(std::string)>* CB_);
-void clientCloseCB(U_SOCKET_client* socketClient);
 void closeCB(U_SOCKET* socketServer);
-void connectionCB(U_SOCKET* socketServer, U_SOCKET_client* socketClient);
+void connectionCB(U_SOCKET* socketServer);
 void errorCB(U_SOCKET* socketServer);
 void listeningCB(U_SOCKET* socketServer);
 void serverConnect(U_SOCKET* socketServer);
@@ -142,24 +141,39 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 #endif
 
-void clientCloseCB(U_SOCKET_client* socketClient) {
-	std::cout << "Server Closed" << std::endl;
-}
-
 void closeCB(U_SOCKET* socketServer) {
 	std::cout << "Server Closed" << std::endl;
 }
 
-void connectionCB(U_SOCKET* socketServer, U_SOCKET_client* socketClient) {
-	socketClient->on("close",
-			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
-	socketClient->on("connect",
-			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
-	socketClient->on("data",
-			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
-	socketClient->on("error",
-			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+void connectionCB(U_SOCKET* socketServer) {
+	U_SOCKET_client* socketClient = socketServer->clientLast();
 	//Game.newPlayer();
+	std::function<void(U_SOCKET_client*)> clientCloseCB =
+			[&Game](U_SOCKET_client* socketClient)
+			{	std::cout << "Player disconnected: " << socketClient->id() << std::endl;
+				//Game->removePlayer(socketClient->id());
+			};
+	std::function<void(U_SOCKET_client*)> clientConnectCB =
+			[&Game](U_SOCKET_client* socketClient)
+			{	std::cout << "Player connected: " << socketClient->id() << std::endl;
+			};
+	std::function<void(U_SOCKET_client*)> clientDataCB =
+			[&Game](U_SOCKET_client* socketClient)
+			{
+				std::string msg = socketClient->msgLast();
+				std::cout << "Client: " << socketClient->id() << " Received Message: " << msg << std::endl;
+				//Game->updatePlayer(socketClient->id(),x,y,angle);
+			};
+	std::function<void(U_SOCKET_client*)> clientErrorCB =
+			[&Game](U_SOCKET_client* socketClient)
+			{
+				std::cout << "Player error: " << socketClient->id() << std::endl;
+			};
+
+	socketClient->on("close", &clientCloseCB);
+	socketClient->on("connect", &clientConnectCB);
+	socketClient->on("data", &clientDataCB);
+	socketClient->on("error", &clientErrorCB);
 }
 
 void errorCB(U_SOCKET* socketServer) {
@@ -176,8 +190,7 @@ void serverConnect(U_SOCKET* socketServer) {
 	try {
 		socketServer->on("close", new std::function<void(U_SOCKET*)>(&closeCB));
 		socketServer->on("connection",
-				new std::function<void(U_SOCKET*, U_SOCKET_client*)>(
-						&connectionCB));
+				new std::function<void(U_SOCKET*)>(&connectionCB));
 		socketServer->on("error", new std::function<void(U_SOCKET*)>(&errorCB));
 		socketServer->on("listening",
 				new std::function<void(U_SOCKET*)>(&listeningCB));
@@ -196,8 +209,4 @@ void serverConnect(U_SOCKET* socketServer) {
 	} catch (const std::exception& e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
-}
-
-void stdinListen(std::function<void(std::string)>* CB_) {
-
 }

@@ -11,86 +11,13 @@
 #include "WIN_SOCKET.h"
 #ifdef _WIN32
 
-WIN_SOCKET::WIN_SOCKET(int port_)
-{
-	port = (u_short) port_;
-	//setup a socket and connection tools
-	memset((char*) &servAddr, 0, sizeof(servAddr));
-	servAddr.sin_family = AF_INET;
-	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons(port);
-	listenFlag = false;
+WIN_SOCKET::WIN_SOCKET() {
+
 }
 
-WIN_SOCKET::WIN_SOCKET(std::string host_, int port_)
-{
-	port = (u_short) port_;
-	host = host_;
-	char* hostC = new char[host.length() + 1];
-	strcpy(hostC, host.c_str());
-
-	/* get IP by host */
-	char hostname[NI_MAXHOST];
-	char servInfo[NI_MAXSERV];
-	std::string errMsg;
-	struct addrinfo hints, *res;
-	struct in_addr addr;
-	int err;
-
-	WSAData data;
-	WSAStartup(MAKEWORD(2, 0), &data);
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_family = AF_INET;
-
-	if ((err = getaddrinfo(host_.c_str(), NULL, &hints, &res)) != 0)
-	{
-		errMsg = "";
-		if (err == 11001)
-		{
-			errMsg = "Host not found";
-		}
-		/*throw std::runtime_error(
-		 "Error Code " + std::to_string(err)
-		 + (errMsg.length() > 0 ? ": " + errMsg : ""));*/
-	}
-
-	try
-	{
-		addr.S_un = ((struct sockaddr_in *) (res->ai_addr))->sin_addr.S_un;
-	} catch (const std::exception& e)
-	{
-		throw std::runtime_error(
-				"Could not connect to the internet." + std::string(e.what()));
-	}
-	freeaddrinfo(res);
-	WSACleanup();
-
-	//setup a socket and connection tools
-	memset((char*) &servAddr, 0, sizeof(servAddr));
-	servAddr.sin_family = AF_INET;
-	servAddr.sin_addr.s_addr = *((unsigned long*) &(addr.S_un));
-	servAddr.sin_port = htons(port);
-	listenFlag = false;
-
-	/* get ip address string */
-	DWORD dwRetval;
-	dwRetval = getnameinfo((struct sockaddr *) &servAddr,
-			sizeof(struct sockaddr), hostname,
-			NI_MAXHOST, servInfo, NI_MAXSERV, NI_NUMERICSERV);
-
-	if (dwRetval == 0)
-	{
-		std::cout << "ip address: " << hostname << std::endl;
-	}
-}
-
-void WIN_SOCKET::sockSetup()
-{
+void WIN_SOCKET::sockSetup() {
 	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-	{
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		throw std::runtime_error("WSAStartup failed.");
 		//return 1;
 	}
@@ -98,35 +25,29 @@ void WIN_SOCKET::sockSetup()
 	//open stream oriented socket with internet address
 	//also keep track of the socket descriptor
 	serverSd = socket(AF_INET, SOCK_STREAM, 0);
-	if (serverSd < 0)
-	{
+	if (serverSd < 0) {
 		throw std::runtime_error("Error establishing the server socket");
 	}
 }
 
-void WIN_SOCKET::sockConnect()
-{
+void WIN_SOCKET::sockConnect() {
 	//try to connect...
 	int status = connect(serverSd, (sockaddr*) &servAddr, sizeof(servAddr));
-	if (status != 0)
-	{
+	if (status != 0) {
 		throw std::runtime_error("Error connecting to socket!");
 	}
 }
 
-void WIN_SOCKET::sockBind()
-{
+void WIN_SOCKET::sockBind() {
 	//bind the socket to its local address
 	int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr,
 			sizeof(servAddr));
-	if (bindStatus < 0)
-	{
+	if (bindStatus < 0) {
 		throw std::runtime_error("Error binding socket to local address");
 	}
 }
 
-void WIN_SOCKET::sockListen()
-{
+void WIN_SOCKET::sockListen() {
 	//listen for up to 5 requests at a time
 	listen(serverSd, 5);
 	//receive a request from client using accept
@@ -153,81 +74,65 @@ void WIN_SOCKET::sockListen()
 	int i = 0;
 	int n = 0;
 	int activity = 0;
-	while (listenFlag)
-	{
-		(*loopCB)(this, 0);
+	while (listenFlag) {
+		//(*loopCB)(this, 0);
 		build_fd_sets(&read_fds, &write_fds, &except_fds);
 		/* linux only: nfds should be set to the highest-numbered file descriptor in any of the three sets, plus 1. */
 		nfds = serverSd;
 		n = connection_list.size();
-		for (i = 0; i < n; ++i)
-		{
+		for (i = 0; i < n; ++i) {
 			if (connection_list[i]->socket > nfds)
 				nfds = connection_list[i]->socket;
 		}
 
 		activity = select(nfds + 1, &read_fds, &write_fds, &except_fds,
 		NULL);
-		if (activity == 0)
-		{
-			(*errCB)(this, 0);
-		}
-		else if (activity == -1)
-		{
-			(*errCB)(this, 0);
+		if (activity == 0) {
+			//(*errCB)(this, 0);
+		} else if (activity == -1) {
+			//(*errCB)(this, 0);
 		}
 
-		if (sockCon(sockNum) == 0)
-		{
-			(*conCB)(this, sockNum);
+		if (sockCon(sockNum) == 0) {
+			//(*conCB)(this, sockNum);
 		}
 
-		if (sockDcon(sockNum) == 0)
-		{
-			(*dconCB)(this, sockNum);
+		if (sockDcon(sockNum) == 0) {
+			//(*dconCB)(this, sockNum);
 		}
 
-		if (FD_ISSET(serverSd, &except_fds))
-		{
-			(*errCB)(this, 0);
+		if (FD_ISSET(serverSd, &except_fds)) {
+			//(*errCB)(this, 0);
 		}
 
 		//std::cout << "connections...\n";
 		n = connection_list.size();
-		for (i = 0; i < n; ++i)
-		{
+		for (i = 0; i < n; ++i) {
 			//std::cout << "socket: " << i << std::endl;
 			if (connection_list[i]->socket != NO_SOCKET
-					&& FD_ISSET(connection_list[i]->socket, &read_fds))
-			{
+					&& FD_ISSET(connection_list[i]->socket, &read_fds)) {
 
 				std::function<int(message_t*)> CB = std::bind(
 						&WIN_SOCKET::handle_received_message, this,
 						std::placeholders::_1);
-				if (receive_from_peer(connection_list[i], &CB) == 0)
-				{
-					(*rcvCB)(this, i);
-				}
-				else
-				{
+				if (receive_from_peer(connection_list[i], &CB) == 0) {
+					//(*rcvCB)(this, i);
+				} else {
 					close_client_connection(connection_list[i]);
 					continue;
 				}
 			}
 
 			if (connection_list[i]->socket != NO_SOCKET
-					&& FD_ISSET(connection_list[i]->socket, &write_fds))
-			{
-				if (send_to_peer(connection_list[i]) != 0)
-				{
+					&& FD_ISSET(connection_list[i]->socket, &write_fds)) {
+				if (send_to_peer(connection_list[i]) != 0) {
 					close_client_connection(connection_list[i]);
 					continue;
 				}
 			}
 
 			if (connection_list[i]->socket != NO_SOCKET
-					&& FD_ISSET(connection_list[i]->socket, &except_fds))
-			{
+					&& FD_ISSET(connection_list[i]->socket, &except_fds)) {
 				printf("Exception client fd.\n");
 				close_client_connection(connection_list[i]);
 				continue;
@@ -273,22 +178,19 @@ void WIN_SOCKET::sockListen()
 	std::cout << "Connection closed..." << std::endl;
 }
 
-void WIN_SOCKET::sockLoop()
-{
+void WIN_SOCKET::sockLoop() {
 	int bytesRead, bytesWritten = 0;
 //std::chrono::system_clock::time_point t1, t2;
 	unsigned int elapsedTime = 0;
 //t1 = std::chrono::system_clock::now();
 	char msg[1500];
-	while (1)
-	{
+	while (1) {
 		std::cout << ">";
 		std::string data;
 		std::getline(std::cin, data);
 		memset(&msg, 0, sizeof(msg)); //clear the buffer
 		strcpy(msg, data.c_str());
-		if (data == "exit")
-		{
+		if (data == "exit") {
 			send(serverSd, (char*) &msg, strlen(msg), 0);
 			break;
 		}
@@ -296,8 +198,7 @@ void WIN_SOCKET::sockLoop()
 		std::cout << "Awaiting server response..." << std::endl;
 		memset(&msg, 0, sizeof(msg)); //clear the buffer
 		bytesRead += recv(serverSd, (char*) &msg, sizeof(msg), 0);
-		if (!strcmp(msg, "exit"))
-		{
+		if (!strcmp(msg, "exit")) {
 			std::cout << "Server has quit the session" << std::endl;
 			break;
 		}
@@ -315,58 +216,113 @@ void WIN_SOCKET::sockLoop()
 	std::cout << "Connection closed" << std::endl;
 }
 
-void WIN_SOCKET::on(std::string event,
-		std::function<void(WIN_SOCKET*, int)>* CB)
-{
-	if (event == "connect")
-	{
+void WIN_SOCKET::listening(int port_) {
+	port = (u_short) port_;
+	//setup a socket and connection tools
+	memset((char*) &servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servAddr.sin_port = htons(port);
+	listenFlag = false;
+}
+
+void WIN_SOCKET::listening(int port_, std::string host_) {
+	port = (u_short) port_;
+	host = host_;
+	char* hostC = new char[host.length() + 1];
+	strcpy(hostC, host.c_str());
+
+	/* get IP by host */
+	char hostname[NI_MAXHOST];
+	char servInfo[NI_MAXSERV];
+	std::string errMsg;
+	struct addrinfo hints, *res;
+	struct in_addr addr;
+	int err;
+
+	WSAData data;
+	WSAStartup(MAKEWORD(2, 0), &data);
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = AF_INET;
+
+	if ((err = getaddrinfo(host_.c_str(), NULL, &hints, &res)) != 0) {
+		errMsg = "";
+		if (err == 11001) {
+			errMsg = "Host not found";
+		}
+		/*throw std::runtime_error(
+		 "Error Code " + std::to_string(err)
+		 + (errMsg.length() > 0 ? ": " + errMsg : ""));*/
+	}
+
+	try {
+		addr.S_un = ((struct sockaddr_in *) (res->ai_addr))->sin_addr.S_un;
+	} catch (const std::exception& e) {
+		throw std::runtime_error(
+				"Could not connect to the internet." + std::string(e.what()));
+	}
+	freeaddrinfo(res);
+	WSACleanup();
+
+	//setup a socket and connection tools
+	memset((char*) &servAddr, 0, sizeof(servAddr));
+	servAddr.sin_family = AF_INET;
+	servAddr.sin_addr.s_addr = *((unsigned long*) &(addr.S_un));
+	servAddr.sin_port = htons(port);
+	listenFlag = false;
+
+	/* get ip address string */
+	DWORD dwRetval;
+	dwRetval = getnameinfo((struct sockaddr *) &servAddr,
+			sizeof(struct sockaddr), hostname,
+			NI_MAXHOST, servInfo, NI_MAXSERV, NI_NUMERICSERV);
+
+	if (dwRetval == 0) {
+		std::cout << "ip address: " << hostname << std::endl;
+	}
+}
+
+void WIN_SOCKET::on(std::string event, std::function<void(WIN_SOCKET*)>* CB) {
+	if (event == "connect") {
 		conCB = CB;
-	}
-	else if (event == "end")
-	{
+	} else if (event == "end") {
 		dconCB = CB;
-	}
-	else if (event == "error")
-	{
+	} else if (event == "error") {
 		errCB = CB;
-	}
-	else if (event == "data")
-	{
+	} else if (event == "data") {
 		rcvCB = CB;
-	}
-	else if (event == "loop")
-	{
+	} else if (event == "loop") {
 		loopCB = CB;
 	}
 }
 
-int WIN_SOCKET::sockCon(int &sockNum)
-{
-	if (FD_ISSET(serverSd, &read_fds))
-	{
+void WIN_SOCKET::onClient(std::string event,
+		std::function<void(WIN_SOCKET*)>* CB) {
+
+}
+
+int WIN_SOCKET::sockCon(int &sockNum) {
+	if (FD_ISSET(serverSd, &read_fds)) {
 		return handle_new_connection(sockNum);
 	}
 }
 
-int WIN_SOCKET::sockDcon(int &sockNum)
-{
+int WIN_SOCKET::sockDcon(int &sockNum) {
 	int i;
 	int n = connection_list.size();
 	u_long iMode;
 	int err = 0;
-	for (i = 0; i < n; ++i)
-	{
-		if (FD_ISSET(connection_list[i]->socket, &read_fds))
-		{
+	for (i = 0; i < n; ++i) {
+		if (FD_ISSET(connection_list[i]->socket, &read_fds)) {
 			iMode = 1;
 			int iResult = ioctlsocket(connection_list[i]->socket,
 			FIONREAD, &iMode);
-			if (iResult != NO_ERROR)
-			{
+			if (iResult != NO_ERROR) {
 				err++;
 			}
-			if (iMode == 0)
-			{
+			if (iMode == 0) {
 				close_client_connection(connection_list[i]);
 			}
 		}
@@ -374,21 +330,18 @@ int WIN_SOCKET::sockDcon(int &sockNum)
 	return err;
 }
 
-int WIN_SOCKET::prepare_message(char *sender, char *data, message_t *message)
-{
+int WIN_SOCKET::prepare_message(char *sender, char *data, message_t *message) {
 	sprintf(message->sender, "%s", sender);
 	sprintf(message->data, "%s", data);
 	return 0;
 }
 
-int WIN_SOCKET::print_message(message_t *message)
-{
+int WIN_SOCKET::print_message(message_t *message) {
 	printf("Message: \"%s: %s\"\n", message->sender, message->data);
 	return 0;
 }
 
-int WIN_SOCKET::create_message_queue(int queue_size, message_queue_t *queue)
-{
+int WIN_SOCKET::create_message_queue(int queue_size, message_queue_t *queue) {
 	queue->data = (message_t*) calloc(queue_size, sizeof(message_t));
 	queue->size = queue_size;
 	queue->current = 0;
@@ -396,14 +349,12 @@ int WIN_SOCKET::create_message_queue(int queue_size, message_queue_t *queue)
 	return 0;
 }
 
-void WIN_SOCKET::delete_message_queue(message_queue_t *queue)
-{
+void WIN_SOCKET::delete_message_queue(message_queue_t *queue) {
 	free(queue->data);
 	queue->data = NULL;
 }
 
-int WIN_SOCKET::enqueue(message_queue_t *queue, message_t *message)
-{
+int WIN_SOCKET::enqueue(message_queue_t *queue, message_t *message) {
 	if (queue->current == queue->size)
 		return -1;
 
@@ -413,8 +364,7 @@ int WIN_SOCKET::enqueue(message_queue_t *queue, message_t *message)
 	return 0;
 }
 
-int WIN_SOCKET::dequeue(message_queue_t *queue, message_t *message)
-{
+int WIN_SOCKET::dequeue(message_queue_t *queue, message_t *message) {
 	if (queue->current == 0)
 		return -1;
 
@@ -424,21 +374,18 @@ int WIN_SOCKET::dequeue(message_queue_t *queue, message_t *message)
 	return 0;
 }
 
-int WIN_SOCKET::dequeue_all(message_queue_t *queue)
-{
+int WIN_SOCKET::dequeue_all(message_queue_t *queue) {
 	queue->current = 0;
 
 	return 0;
 }
 
-int WIN_SOCKET::delete_peer(peer_t *peer)
-{
+int WIN_SOCKET::delete_peer(peer_t *peer) {
 	closesocket(peer->socket);
 	delete_message_queue(&peer->send_buffer);
 }
 
-int WIN_SOCKET::create_peer(peer_t *peer)
-{
+int WIN_SOCKET::create_peer(peer_t *peer) {
 	create_message_queue(MAX_MESSAGES_BUFFER_SIZE, &peer->send_buffer);
 
 	peer->current_sending_byte = -1;
@@ -447,8 +394,7 @@ int WIN_SOCKET::create_peer(peer_t *peer)
 	return 0;
 }
 
-char* WIN_SOCKET::peer_get_addres_str(peer_t *peer)
-{
+char* WIN_SOCKET::peer_get_addres_str(peer_t *peer) {
 	/*static char ret[INET_ADDRSTRLEN + 10];
 	 char peer_ipv4_str[INET_ADDRSTRLEN];
 	 inet_ntop(AF_INET, &peer->addres.sin_addr, peer_ipv4_str, INET_ADDRSTRLEN);
@@ -457,25 +403,21 @@ char* WIN_SOCKET::peer_get_addres_str(peer_t *peer)
 	return "test";
 }
 
-int WIN_SOCKET::peer_add_to_send(peer_t *peer, message_t *message)
-{
+int WIN_SOCKET::peer_add_to_send(peer_t *peer, message_t *message) {
 	return enqueue(&peer->send_buffer, message);
 }
 
 /* Receive message from peer and handle it with message_handler(). */
 int WIN_SOCKET::receive_from_peer(peer_t *peer,
-		std::function<int(message_t*)>* CB)
-{
+		std::function<int(message_t*)>* CB) {
 	printf("Ready for recv() from %s.\n", peer_get_addres_str(peer));
 
 	size_t len_to_receive;
 	ssize_t received_count;
 	size_t received_total = 0;
-	do
-	{
+	do {
 		// Is completely received?
-		if (peer->current_receiving_byte >= sizeof(peer->receiving_buffer))
-		{
+		if (peer->current_receiving_byte >= sizeof(peer->receiving_buffer)) {
 			(*CB)(&peer->receiving_buffer);
 			peer->current_receiving_byte = 0;
 		}
@@ -490,32 +432,23 @@ int WIN_SOCKET::receive_from_peer(peer_t *peer,
 		received_count = recv(peer->socket,
 				(char *) &peer->receiving_buffer + peer->current_receiving_byte,
 				len_to_receive, MSG_DONTWAIT);
-		if (received_count < 0)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-			{
+		if (received_count < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
 				printf("peer is not ready right now, try again later.\n");
-			}
-			else
-			{
+			} else {
 				perror("recv() from peer error");
 				//return -1;
 				break;
 			}
-		}
-		else if (received_count < 0
-				&& (errno == EAGAIN || errno == EWOULDBLOCK))
-		{
+		} else if (received_count < 0
+				&& (errno == EAGAIN || errno == EWOULDBLOCK)) {
 			break;
 		}
 		// If recv() returns 0, it means that peer gracefully shutdown. Shutdown client.
-		else if (received_count == 0)
-		{
+		else if (received_count == 0) {
 			printf("recv() 0 bytes. Peer gracefully shutdown.\n");
 			return -1;
-		}
-		else if (received_count > 0)
-		{
+		} else if (received_count > 0) {
 			peer->current_receiving_byte += received_count;
 			received_total += received_count;
 			std::cout << "recv() bytes: " << received_count << std::endl;
@@ -526,23 +459,19 @@ int WIN_SOCKET::receive_from_peer(peer_t *peer,
 	return 0;
 }
 
-int WIN_SOCKET::send_to_peer(peer_t *peer)
-{
+int WIN_SOCKET::send_to_peer(peer_t *peer) {
 	printf("Ready for send() to %s.\n", peer_get_addres_str(peer));
 
 	size_t len_to_send;
 	ssize_t send_count;
 	size_t send_total = 0;
-	do
-	{
+	do {
 		// If sending message has completely sent and there are messages in queue, why not send them?
 		if (peer->current_sending_byte < 0
-				|| peer->current_sending_byte >= sizeof(peer->sending_buffer))
-		{
+				|| peer->current_sending_byte >= sizeof(peer->sending_buffer)) {
 			printf(
 					"There is no pending to send() message, maybe we can find one in queue... ");
-			if (dequeue(&peer->send_buffer, &peer->sending_buffer) != 0)
-			{
+			if (dequeue(&peer->send_buffer, &peer->sending_buffer) != 0) {
 				peer->current_sending_byte = -1;
 				printf("No, there is nothing to send() anymore.\n");
 				break;
@@ -560,31 +489,22 @@ int WIN_SOCKET::send_to_peer(peer_t *peer)
 		send_count = send(peer->socket,
 				(char *) &peer->sending_buffer + peer->current_sending_byte,
 				len_to_send, 0);
-		if (send_count < 0)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-			{
+		if (send_count < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
 				printf("peer is not ready right now, try again later.\n");
-			}
-			else
-			{
+			} else {
 				perror("send() from peer error");
 				return -1;
 			}
 		}
 		// we have read as many as possible
-		else if (send_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-		{
+		else if (send_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
 			break;
-		}
-		else if (send_count == 0)
-		{
+		} else if (send_count == 0) {
 			printf(
 					"send()'ed 0 bytes. It seems that peer can't accept data right now. Try again later.\n");
 			break;
-		}
-		else if (send_count > 0)
-		{
+		} else if (send_count > 0) {
 			peer->current_sending_byte += send_count;
 			send_total += send_count;
 			printf("send()'ed %zd bytes.\n", send_count);
@@ -595,32 +515,25 @@ int WIN_SOCKET::send_to_peer(peer_t *peer)
 	return 0;
 }
 
-int WIN_SOCKET::read_from_stdin(char *read_buffer, size_t max_len)
-{
+int WIN_SOCKET::read_from_stdin(char *read_buffer, size_t max_len) {
 	memset(read_buffer, 0, max_len);
 
 	ssize_t read_count = 0;
 	ssize_t total_read = 0;
 
-	do
-	{
+	do {
 		std::cout << "reading\n";
 		read_count = read(STDIN_FILENO, read_buffer, max_len);
 		//std::cout << "--------------------------\n" << read_buffer << "\n";
-		if (read_count < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
-		{
+		if (read_count < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
 			perror("read()");
 			return -1;
-		}
-		else if (read_count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-		{
+		} else if (read_count < 0
+				&& (errno == EAGAIN || errno == EWOULDBLOCK)) {
 			break;
-		}
-		else if (read_count > 0)
-		{
+		} else if (read_count > 0) {
 			total_read += read_count;
-			if (total_read > max_len)
-			{
+			if (total_read > max_len) {
 				printf(
 						"Message too large and will be chopped. Please try to be shorter next time.\n");
 				fflush(STDIN_FILENO);
@@ -639,8 +552,7 @@ int WIN_SOCKET::read_from_stdin(char *read_buffer, size_t max_len)
 	return 0;
 }
 
-void WIN_SOCKET::shutdown_properly(int code)
-{
+void WIN_SOCKET::shutdown_properly(int code) {
 	int i;
 	int n = connection_list.size();
 
@@ -655,8 +567,7 @@ void WIN_SOCKET::shutdown_properly(int code)
 }
 
 int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
-		fd_set *except_fds)
-{
+		fd_set *except_fds) {
 	int i;
 	int n = connection_list.size();
 
@@ -683,8 +594,7 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 	return 0;
 }
 
-int WIN_SOCKET::handle_new_connection(int &sockNum)
-{
+int WIN_SOCKET::handle_new_connection(int &sockNum) {
 	sockaddr_in client_addr;
 	memset(&client_addr, 0, sizeof(client_addr));
 	socklen_t client_len = sizeof(client_addr);
@@ -692,8 +602,7 @@ int WIN_SOCKET::handle_new_connection(int &sockNum)
 	int new_client_sock = accept(serverSd, (struct sockaddr *) &client_addr,
 			&client_len);
 	std::cout << "accept...DONE" << std::endl;
-	if (new_client_sock < 0)
-	{
+	if (new_client_sock < 0) {
 		perror("accept()");
 		return -1;
 	}
@@ -702,8 +611,7 @@ int WIN_SOCKET::handle_new_connection(int &sockNum)
 	int err = getnameinfo((struct sockaddr*) &client_addr.sin_addr,
 			sizeof(client_addr.sin_addr), client_ipv4_str,
 			sizeof(client_ipv4_str), 0, 0, NI_NUMERICHOST);
-	if (err != 0)
-	{
+	if (err != 0) {
 		strcpy(client_ipv4_str, "error");
 	}
 //inet_ntop(AF_INET, &client_addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
@@ -723,8 +631,7 @@ int WIN_SOCKET::handle_new_connection(int &sockNum)
 
 	u_long iMode = 1;
 	int iResult = ioctlsocket(new_client_sock, FIONBIO, &iMode);
-	if (iResult != NO_ERROR)
-	{
+	if (iResult != NO_ERROR) {
 		printf("ioctlsocket failed with error: %d\n", iResult);
 	}
 
@@ -736,8 +643,7 @@ int WIN_SOCKET::handle_new_connection(int &sockNum)
 	return -1;
 }
 
-int WIN_SOCKET::close_client_connection(peer_t *client)
-{
+int WIN_SOCKET::close_client_connection(peer_t *client) {
 	printf("Close client socket for %s.\n", peer_get_addres_str(client));
 
 	closesocket(client->socket);
@@ -748,8 +654,7 @@ int WIN_SOCKET::close_client_connection(peer_t *client)
 }
 
 /* Reads from stdin and create new message. This message enqueues to send queueu. */
-int WIN_SOCKET::handle_read_from_stdin()
-{
+int WIN_SOCKET::handle_read_from_stdin() {
 	char read_buffer[DATA_MAXSIZE]; // buffer for stdin
 	if (read_from_stdin(read_buffer, DATA_MAXSIZE) != 0)
 		return -1;
@@ -762,12 +667,9 @@ int WIN_SOCKET::handle_read_from_stdin()
 	/* enqueue message for all clients */
 	int i;
 	int n = connection_list.size();
-	for (i = 0; i < n; ++i)
-	{
-		if (connection_list[i]->socket != NO_SOCKET)
-		{
-			if (peer_add_to_send(connection_list[i], &new_message) != 0)
-			{
+	for (i = 0; i < n; ++i) {
+		if (connection_list[i]->socket != NO_SOCKET) {
+			if (peer_add_to_send(connection_list[i], &new_message) != 0) {
 				printf("Send buffer was overflowed, we lost this message!\n");
 				continue;
 			}
@@ -778,30 +680,25 @@ int WIN_SOCKET::handle_read_from_stdin()
 	return 0;
 }
 
-int WIN_SOCKET::handle_received_message(message_t *message)
-{
+int WIN_SOCKET::handle_received_message(message_t *message) {
 	printf("Received message from client.\n");
 	print_message(message);
 	return 0;
 }
 
-void WIN_SOCKET::stdinListen(std::string str)
-{
+void WIN_SOCKET::stdinListen(std::string str) {
 	std::cout << "got: " << str << std::endl;
 }
 
-void WIN_SOCKET::sendFromServer(std::string data)
-{
+void WIN_SOCKET::sendFromServer(std::string data) {
 	char msg[1500];
 	memset(&msg, 0, sizeof(msg)); //clear the buffer
 	strcpy(msg, data.c_str());
 	send(acceptSd, (char*) &msg, strlen(msg), 0);
 }
 
-void signalHandle::cb(int sig_number)
-{
-	if (sig_number == SIGINT)
-	{
+void signalHandle::cb(int sig_number) {
+	if (sig_number == SIGINT) {
 		printf("SIGINT was caught!\n");
 		//((o).(*fn))(EXIT_SUCCESS);
 	}
@@ -811,8 +708,7 @@ void signalHandle::cb(int sig_number)
 	 }*/
 }
 
-int signalHandle::init()
-{
+int signalHandle::init() {
 	signal(SIGABRT, signalHandle::cb);
 	/*
 	 if (signal(SIGINT, &sa, 0) != 0) {

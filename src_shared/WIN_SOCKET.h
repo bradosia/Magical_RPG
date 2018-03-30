@@ -52,23 +52,20 @@
 #define EAGAIN          11      /* Try again */
 #define EWOULDBLOCK     EAGAIN  /* Operation would block */
 
-class message_t
-{
+class message_t {
 public:
 	char sender[SENDER_MAXSIZE];
 	char data[DATA_MAXSIZE];
 };
 
-class message_queue_t
-{
+class message_queue_t {
 public:
 	int size;
 	message_t *data;
 	int current;
 };
 
-class peer_t
-{
+class peer_t {
 public:
 	int socket;
 	sockaddr_in addres;
@@ -95,8 +92,7 @@ public:
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class WIN_SOCKET
-{
+class WIN_SOCKET {
 private:
 	sockaddr_in servAddr;
 	int serverSd;
@@ -108,22 +104,26 @@ private:
 	fd_set read_fds;
 	fd_set write_fds;
 	fd_set except_fds;
-	std::function<void(WIN_SOCKET*, int)>* conCB;
-	std::function<void(WIN_SOCKET*, int)>* dconCB;
-	std::function<void(WIN_SOCKET*, int)>* rcvCB;
-	std::function<void(WIN_SOCKET*, int)>* errCB;
-	std::function<void(WIN_SOCKET*, int)>* loopCB;
+	std::function<void(WIN_SOCKET*)>* conCB;
+	std::function<void(WIN_SOCKET*)>* dconCB;
+	std::function<void(WIN_SOCKET*)>* rcvCB;
+	std::function<void(WIN_SOCKET*)>* errCB;
+	std::function<void(WIN_SOCKET*)>* loopCB;
 
 public:
-	WIN_SOCKET(int port);
-	WIN_SOCKET(std::string host_, int port);
+	WIN_SOCKET();
 	// socket connections
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
 	void sockListen();
 	void sockLoop();
-	void on(std::string event, std::function<void(WIN_SOCKET*, int)>* CB);
+
+	void listening(int port_, std::string host_);
+	void listening(int port_);
+
+	void on(std::string event, std::function<void(WIN_SOCKET*)>* CB);
+	void onClient(std::string event, std::function<void(WIN_SOCKET*)>* CB);
 	/** Checks and handles socket connection
 	 @pre None
 	 @post None
@@ -185,8 +185,7 @@ public:
 
 typedef void (WIN_SOCKET::*WIN_SOCKET_FN)(int code);
 
-class signalHandle
-{
+class signalHandle {
 private:
 	static bool cb_flag;
 	static WIN_SOCKET o;

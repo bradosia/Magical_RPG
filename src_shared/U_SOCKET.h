@@ -34,6 +34,36 @@
 
 #define BUFFER_SIZE 1024
 
+class U_SOCKET_client {
+private:
+	UU_SOCKET *sockObjPtr;
+public:
+	U_SOCKET_client();
+	int id();
+	void on(std::string event, std::function<void(U_SOCKET_client*)>* CB);
+	/*
+	 * socket.write(data[, encoding][, callback])
+	 */
+	void write(std::string msg_, std::function<void(U_SOCKET_client*)>* CB);
+	std::string msgLast();
+};
+
+class U_SOCKET_addr {
+public:
+	int port;
+	std::string family;
+	std::string address;
+};
+
+class U_SOCKET_close {
+public:
+	bool success;
+};
+
+class U_SOCKET_broadcast {
+
+};
+
 /**
  @class U_SOCKET
  Uses libraries for a basic winsock application.
@@ -63,11 +93,11 @@ public:
 	 * { port: 12346, family: 'IPv4', address: '127.0.0.1' }
 	 * obj = server.address();
 	 */
-	U_SOCKET_addr address();
+	U_SOCKET_addr* address();
 	/*
 	 * server.close([callback]);
 	 */
-	U_SOCKET_close close();
+	U_SOCKET_close* close();
 	/*
 	 * server.getConnections(callback);
 	 * callback = function(err, count){};
@@ -81,32 +111,8 @@ public:
 	U_SOCKET_broadcast broadcast(std::string msg_);
 	void on(std::string event, std::function<void(U_SOCKET*)>* CB);
 	void stdinListen(std::string str);
+	U_SOCKET_client* clientLast();
 	std::string errorMsgLast();
-};
-
-class U_SOCKET_addr {
-public:
-	int port;
-	std::string family;
-	std::string address;
-};
-
-class U_SOCKET_close {
-public:
-	bool success;
-};
-
-class U_SOCKET_broadcast {
-
-};
-
-class U_SOCKET_client {
-public:
-	void on(std::string event, std::function<void(U_SOCKET_client*)>* CB);
-	/*
-	 * socket.write(data[, encoding][, callback])
-	 */
-	void write(std::string msg_, std::function<void(U_SOCKET*, int)>* CB);
 };
 
 #endif
