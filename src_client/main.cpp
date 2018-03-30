@@ -30,9 +30,13 @@
 #include "globals.h"
 #include "cGame.h"
 
-void listenCB(U_SOCKET* socketServer);
-
-void serverConnect();
+void stdinListen(std::function<void(std::string)>* CB_);
+void clientCloseCB(U_SOCKET_client* socketClient);
+void closeCB(U_SOCKET* socketServer);
+void connectionCB(U_SOCKET* socketServer, U_SOCKET_client* socketClient);
+void errorCB(U_SOCKET* socketServer);
+void listeningCB(U_SOCKET* socketServer);
+void serverConnect(U_SOCKET* socketServer);
 
 cGame Game;
 
@@ -63,9 +67,14 @@ void AppIdle() {
 }
 
 void init(int argc, char** argv) {
+	U_SOCKET* socketServer = new U_SOCKET();
+
 	//XWIN::removeConsole(); // closing the openGL window wont close the main process
 	std::string projectName = "Magical RPG";
-	std::thread first(serverConnect);
+	std::thread first(serverConnect, socketServer);
+	std::function<void(std::string)> CB = [&socketServer](std::string str)
+	{	socketServer->stdinListen(str);};
+	std::thread second(stdinListen, &CB);
 
 	int res_x, res_y, pos_x, pos_y;
 
@@ -133,23 +142,62 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 #endif
 
-void listenCB(U_SOCKET* socketServer) {
-
+void clientCloseCB(U_SOCKET_client* socketClient) {
+	std::cout << "Server Closed" << std::endl;
 }
 
-void serverConnect() {
-	U_SOCKET* socketServer;
+void closeCB(U_SOCKET* socketServer) {
+	std::cout << "Server Closed" << std::endl;
+}
+
+void connectionCB(U_SOCKET* socketServer, U_SOCKET_client* socketClient) {
+	socketClient->on("close",
+			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+	socketClient->on("connect",
+			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+	socketClient->on("data",
+			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+	socketClient->on("error",
+			new std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+	//Game.newPlayer();
+}
+
+void errorCB(U_SOCKET* socketServer) {
+	std::cout << socketServer->errorMsgLast() << std::endl;
+}
+
+void listeningCB(U_SOCKET* socketServer) {
+	U_SOCKET_addr* sockAddr = socketServer->address();
+	std::cout << "Listening on port: " << sockAddr->port << "address: "
+			<< sockAddr->address << std::endl;
+}
+
+void serverConnect(U_SOCKET* socketServer) {
 	try {
-		std::cout << "New Socket..." << std::endl;
-		socketServer = new U_SOCKET("localhost", 9573);
-		std::cout << "Setup..." << std::endl;
-		socketServer->sockSetup();
-		std::cout << "Connecting..." << std::endl;
-		socketServer->sockConnect();
-		std::cout << "Looping..." << std::endl;
-		//socketServer->sockLoop(new std::function<void(U_SOCKET*)>(&listenCB));
+		socketServer->on("close", new std::function<void(U_SOCKET*)>(&closeCB));
+		socketServer->on("connection",
+				new std::function<void(U_SOCKET*, U_SOCKET_client*)>(
+						&connectionCB));
+		socketServer->on("error", new std::function<void(U_SOCKET*)>(&errorCB));
+		socketServer->on("listening",
+				new std::function<void(U_SOCKET*)>(&listeningCB));
+		socketServer->listen(9573, "localhost");
+
+		/*
+		 std::cout << "New Socket..." << std::endl;
+		 socketServer = new U_SOCKET("localhost", 9573);
+		 std::cout << "Setup..." << std::endl;
+		 socketServer->sockSetup();
+		 std::cout << "Connecting..." << std::endl;
+		 socketServer->sockConnect();
+		 std::cout << "Looping..." << std::endl;
+		 socketServer->sockLoop(new std::function<void(U_SOCKET*)>(&listenCB));
+		 */
 	} catch (const std::exception& e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
 }
 
+void stdinListen(std::function<void(std::string)>* CB_) {
+
+}

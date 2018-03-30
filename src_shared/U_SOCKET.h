@@ -39,22 +39,74 @@
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class U_SOCKET
-{
+class U_SOCKET {
 private:
 	UU_SOCKET *sockObjPtr;
-public:
-	U_SOCKET(int port);
-	U_SOCKET(std::string host_, int port);
-	U_SOCKET(UU_SOCKET *sock_);
+	std::vector<U_SOCKET_client> *srvConnections;
 	void sockSetup();
 	void sockConnect();
 	void sockBind();
 	void sockListen();
 	void sockLoop();
-	void on(std::string event, std::function<void(U_SOCKET*, int)>* CB);
+public:
+	/*
+	 * equivalent to Node.js:
+	 * server = new net.Server([options][, connectionListener]);
+	 * server = net.createServer([options][, connectionListener]);
+	 * client = new net.Socket([options]);
+	 *
+	 */
+	U_SOCKET();
+	U_SOCKET(UU_SOCKET *sock_);
+	/*
+	 * Returns an object with port, family, and address properties:
+	 * { port: 12346, family: 'IPv4', address: '127.0.0.1' }
+	 * obj = server.address();
+	 */
+	U_SOCKET_addr address();
+	/*
+	 * server.close([callback]);
+	 */
+	U_SOCKET_close close();
+	/*
+	 * server.getConnections(callback);
+	 * callback = function(err, count){};
+	 */
+	void getConnections(std::function<void(std::string err, int count)>* CB);
+	/*
+	 * server.listen(PORT, HOST);
+	 */
+	void listen(int port_, std::string host_);
+	void listen(int port_);
+	U_SOCKET_broadcast broadcast(std::string msg_);
+	void on(std::string event, std::function<void(U_SOCKET*)>* CB);
 	void stdinListen(std::string str);
-	void sendFromServer(std::string data);
+	std::string errorMsgLast();
+};
+
+class U_SOCKET_addr {
+public:
+	int port;
+	std::string family;
+	std::string address;
+};
+
+class U_SOCKET_close {
+public:
+	bool success;
+};
+
+class U_SOCKET_broadcast {
+
+};
+
+class U_SOCKET_client {
+public:
+	void on(std::string event, std::function<void(U_SOCKET_client*)>* CB);
+	/*
+	 * socket.write(data[, encoding][, callback])
+	 */
+	void write(std::string msg_, std::function<void(U_SOCKET*, int)>* CB);
 };
 
 #endif
