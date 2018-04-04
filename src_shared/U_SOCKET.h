@@ -37,15 +37,22 @@
 class U_SOCKET_client {
 private:
 	UU_SOCKET *sockObjPtr;
+	static void CBA(std::function<void(U_SOCKET_client*)> CB,
+	UU_SOCKET* sock_);
+
 public:
 	U_SOCKET_client();
+	U_SOCKET_client(UU_SOCKET *sock_);
 	int id();
-	void on(std::string event, std::function<void(U_SOCKET_client*)>* CB);
+	void on(std::string event, std::function<void(U_SOCKET_client*)> CB);
 	/*
 	 * socket.write(data[, encoding][, callback])
 	 */
+	void connect(int port_, std::string host_);
 	void write(std::string msg_, std::function<void(U_SOCKET_client*)>* CB);
+	void commandStr(std::string str);
 	std::string msgLast();
+	std::string errorMsgLast();
 };
 
 class U_SOCKET_addr {
@@ -73,11 +80,9 @@ class U_SOCKET {
 private:
 	UU_SOCKET *sockObjPtr;
 	std::vector<U_SOCKET_client> *srvConnections;
-	void sockSetup();
-	void sockConnect();
-	void sockBind();
-	void sockListen();
-	void sockLoop();
+	static void CBA(std::function<void(U_SOCKET*)> CB,
+	UU_SOCKET* sock_);
+
 public:
 	/*
 	 * equivalent to Node.js:
@@ -109,8 +114,8 @@ public:
 	void listen(int port_, std::string host_);
 	void listen(int port_);
 	U_SOCKET_broadcast broadcast(std::string msg_);
-	void on(std::string event, std::function<void(U_SOCKET*)>* CB);
-	void stdinListen(std::string str);
+	void on(std::string event, std::function<void(U_SOCKET*)> CB);
+	void commandStr(std::string str);
 	U_SOCKET_client* clientLast();
 	std::string errorMsgLast();
 };

@@ -17,14 +17,13 @@
 #include <iostream>
 #include <locale>
 #include <string>
+#include <unordered_map>
 #include <stdio.h>
 #include <fstream>
 #include <stdexcept>     // std::runtime_error
 #include <functional>
 #include <chrono>
 #include <vector>
-#include <signal.h>
-#include <io.h>
 
 /* windows sock */
 #define _WIN32_WINNT 0x6000 // getaddrinfo and freeaddrinfo
@@ -52,41 +51,6 @@
 #define EAGAIN          11      /* Try again */
 #define EWOULDBLOCK     EAGAIN  /* Operation would block */
 
-class message_t {
-public:
-	char sender[SENDER_MAXSIZE];
-	char data[DATA_MAXSIZE];
-};
-
-class message_queue_t {
-public:
-	int size;
-	message_t *data;
-	int current;
-};
-
-class peer_t {
-public:
-	int socket;
-	sockaddr_in addres;
-
-	/* Messages that waiting for send. */
-	message_queue_t send_buffer;
-
-	/* Buffered sending message.
-	 *
-	 * In case we doesn't send whole message per one call send().
-	 * And current_sending_byte is a pointer to the part of data that will be send next call.
-	 */
-	message_t sending_buffer;
-	size_t current_sending_byte;
-
-	/* The same for the receiving message. */
-	message_t receiving_buffer;
-	size_t current_receiving_byte;
-
-};
-
 /**
  @class WinHTTP
  Uses libraries for a basic winsock application.
@@ -94,106 +58,78 @@ public:
  */
 class WIN_SOCKET {
 private:
-	sockaddr_in servAddr;
-	int serverSd;
-	int acceptSd;
+	int sockId;
+	sockaddr_in sockAddr;
+	unsigned long sockAddrUn;
 	bool listenFlag;
 	std::string host;
+	std::string hostName;
+	std::string sockFamily;
+	std::string rcvMsgCurrent;
+	std::string sendMsgCurrent;
+	std::vector<std::string> rcvMsgList;
+	std::vector<std::string> errorMsgList;
 	u_short port;
-	std::vector<peer_t*> connection_list;
+	std::vector<WIN_SOCKET*> connectionList;
+	int connectionLastIndex;
 	fd_set read_fds;
 	fd_set write_fds;
 	fd_set except_fds;
-	std::function<void(WIN_SOCKET*)>* conCB;
-	std::function<void(WIN_SOCKET*)>* dconCB;
-	std::function<void(WIN_SOCKET*)>* rcvCB;
-	std::function<void(WIN_SOCKET*)>* errCB;
-	std::function<void(WIN_SOCKET*)>* loopCB;
-
-public:
-	WIN_SOCKET();
+	int sendBytes;
+	int rcvBytes;
+	std::unordered_map<std::string, std::function<void(WIN_SOCKET*)>> CBmap;
+	void setHost(std::string host_);
+	void setPort(int port_, unsigned long IP_address);
 	// socket connections
 	void sockSetup();
-	void sockConnect();
-	void sockBind();
-	void sockListen();
-	void sockLoop();
-
-	void listening(int port_, std::string host_);
-	void listening(int port_);
-
-	void on(std::string event, std::function<void(WIN_SOCKET*)>* CB);
-	void onClient(std::string event, std::function<void(WIN_SOCKET*)>* CB);
+	void sockClientConnect();
+	void sockClientLoop();
+	void sockSrvBind();
+	void sockSrvListen();
+	int cmdRCV();
+	int sockSend();
+	void sockSend(std::string data);
 	/** Checks and handles socket connection
 	 @pre None
 	 @post None
 	 @param sockNum socket number connected, unchanged if not connected
 	 @return 0 on success, error code on failure
 	 */
-	int sockCon(int &sockNum);
+	int sockCon();
 	/** Checks and handles socket disconnection
 	 @pre None
 	 @post None
 	 @param sockNum socket number disconnected, unchanged if not disconnected
 	 @return 0 on success, error code on failure
 	 */
-	int sockDcon(int &sockNum);
-	/** Checks and handles socket error
-	 @pre None
-	 @post None
-	 @param sockNum socket number disconnected, unchanged if not disconnected
-	 @return 0 on success, error code on failure
-	 */
-	int sockError(int &sockNum);
-	/** Checks and handles socket receive
-	 @pre None
-	 @post None
-	 @param sockNum socket number disconnected, unchanged if not disconnected
-	 @return 0 on success, error code on failure
-	 */
-	int sockRcv(int &sockNum);
-	// message --------------------------------------------------------------------
-	int prepare_message(char *sender, char *data, message_t *message);
-	int print_message(message_t *message);
-	// message queue --------------------------------------------------------------
-	int create_message_queue(int queue_size, message_queue_t *queue);
-	void delete_message_queue(message_queue_t *queue);
-	int enqueue(message_queue_t *queue, message_t *message);
-	int dequeue(message_queue_t *queue, message_t *message);
-	int dequeue_all(message_queue_t *queue);
-
-	int delete_peer(peer_t *peer);
-	int create_peer(peer_t *peer);
-	char* peer_get_addres_str(peer_t *peer);
-	int peer_add_to_send(peer_t *peer, message_t *message);
-	int receive_from_peer(peer_t *peer, std::function<int(message_t*)>* CB);
-	int send_to_peer(peer_t *peer);
-
-	int read_from_stdin(char *read_buffer, size_t max_len);
-
-	void shutdown_properly(int code);
+	int sockDcon();
 	int build_fd_sets(fd_set *read_fds, fd_set *write_fds, fd_set *except_fds);
-	int handle_new_connection(int &sockNum);
-	int close_client_connection(peer_t *client);
-	int handle_read_from_stdin();
-	int handle_received_message(message_t *message);
-
-	void stdinListen(std::string str);
-
-	void sendFromServer(std::string data);
-};
-
-typedef void (WIN_SOCKET::*WIN_SOCKET_FN)(int code);
-
-class signalHandle {
-private:
-	static bool cb_flag;
-	static WIN_SOCKET o;
-	static WIN_SOCKET_FN fn;
 
 public:
-	static void cb(int sig_number);
-	static int init();
+	WIN_SOCKET();
+	/* connection & listening */
+	void listening(int port_, std::string host_);
+	void listening(int port_);
+	void connecting(int port_, std::string host_);
+	void sockClose();
+	/* event listeners */
+	void on(std::string event, std::function<void(WIN_SOCKET*)> CB_);
+	void emit(std::string event);
+	/* get/set */
+	int getPort();
+	int getSockId();
+	std::string getFamily();
+	std::string getAddress();
+	WIN_SOCKET* clientLast();
+	std::string rcvMsgLast();
+	std::string errorMsgLast();
+	std::string getSendMsgCurrent();
+	void setSockId(int sockId_);
+	void setSockAddr(sockaddr_in addr_);
+	void getHostName(std::string &hostname_, std::string &service_);
+	/* string commands */
+	void commandSrvStr(std::string str);
+	void commandClientStr(std::string str);
 };
 
 #endif

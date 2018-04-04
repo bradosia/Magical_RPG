@@ -4,7 +4,14 @@
 #include <iostream>
 #include <string>
 #include <functional>
+#include <signal.h>
+#include <io.h>
 
-void stdinListen(std::function<void(std::string)>* CB);
+class stdinHandle {
+public:
+	static void listen(std::function<void(std::string)> CB);
+	static void signalCB(int sig_number);
+	static int signalInit();
+};
 
 #endif
