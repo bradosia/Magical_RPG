@@ -8,7 +8,7 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "WIN_SOCKET.h"
+#include "../platform/WIN_SOCKET.h"
 #ifdef _WIN32
 
 void WIN_SOCKET::setPort(int port_, unsigned long IP_address) {
@@ -64,6 +64,7 @@ WIN_SOCKET::WIN_SOCKET() {
 	rcvMsgCurrent = "";
 	sendMsgCurrent = "";
 	connectionLastIndex = -1;
+	connectFlag = true;
 }
 
 void WIN_SOCKET::sockSetup() {
@@ -89,6 +90,7 @@ void WIN_SOCKET::sockClientConnect() {
 	if (status != 0) {
 		throw std::runtime_error("Error connecting to socket!");
 	}
+	connectFlag = true;
 }
 
 void WIN_SOCKET::sockClientLoop() {
@@ -123,6 +125,7 @@ void WIN_SOCKET::sockSrvBind() {
 	if (bindStatus < 0) {
 		throw std::runtime_error("Error binding socket to local address");
 	}
+	connectFlag = true;
 }
 
 void WIN_SOCKET::sockSrvListen() {
@@ -170,22 +173,21 @@ void WIN_SOCKET::sockSrvListen() {
 
 		n = connectionList.size();
 		for (i = 0; i < n; ++i) {
-			if (connectionList[i]->getSockId() != NO_SOCKET
-					&& FD_ISSET(connectionList[i]->getSockId(), &read_fds)) {
-				if (connectionList[i]->cmdRCV() <= 0) {
-					std::cout << "[" << connectionList[i]->getSockId()
-							<< "] CLOSING: read 0 bytes" << std::endl;
+			if (connectionList[i]->activeCon()) {
+				if (FD_ISSET(connectionList[i]->getSockId(), &read_fds)) {
+					if (connectionList[i]->cmdRCV() <= 0) {
+						std::cout << "[" << connectionList[i]->getSockId()
+								<< "] CLOSING: read 0 bytes" << std::endl;
+						connectionList[i]->sockClose();
+					}
+				}
+				if (FD_ISSET(connectionList[i]->getSockId(), &write_fds)) {
+					connectionList[i]->sockSend();
+				}
+
+				if (FD_ISSET(connectionList[i]->getSockId(), &except_fds)) {
 					connectionList[i]->sockClose();
 				}
-			}
-			if (connectionList[i]->getSockId() != NO_SOCKET
-					&& FD_ISSET(connectionList[i]->getSockId(), &write_fds)) {
-				connectionList[i]->sockSend();
-			}
-
-			if (connectionList[i]->getSockId() != NO_SOCKET
-					&& FD_ISSET(connectionList[i]->getSockId(), &except_fds)) {
-				connectionList[i]->sockClose();
 			}
 		}
 	}
@@ -313,6 +315,21 @@ void WIN_SOCKET::sockSend(std::string data) {
 	sockSend();
 }
 
+void WIN_SOCKET::sockSend(std::string data, int client_) {
+	int i;
+	int n = connectionList.size();
+	for (i = 0; i < n; ++i)
+		if (connectionList[i]->getSockId() == client_)
+			connectionList[i]->sockSend(data);
+}
+
+void WIN_SOCKET::sockSendAll(std::string data) {
+	int i;
+	int n = connectionList.size();
+	for (i = 0; i < n; ++i)
+		connectionList[i]->sockSend(data);
+}
+
 int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 		fd_set *except_fds) {
 	int i;
@@ -321,19 +338,19 @@ int WIN_SOCKET::build_fd_sets(fd_set *read_fds, fd_set *write_fds,
 	FD_ZERO(read_fds);
 	FD_SET(sockId, read_fds);
 	for (i = 0; i < n; ++i)
-		if (connectionList[i]->getSockId() != NO_SOCKET)
+		if (connectionList[i]->activeCon())
 			FD_SET(connectionList[i]->getSockId(), read_fds);
 
 	FD_ZERO(write_fds);
 	for (i = 0; i < n; ++i)
-		if (connectionList[i]->getSockId() != NO_SOCKET
+		if (connectionList[i]->activeCon()
 				&& connectionList[i]->getSendMsgCurrent().length() > 0)
 			FD_SET(connectionList[i]->getSockId(), write_fds);
 
 	FD_ZERO(except_fds);
 	FD_SET(sockId, except_fds);
 	for (i = 0; i < n; ++i)
-		if (connectionList[i]->getSockId() != NO_SOCKET)
+		if (connectionList[i]->activeCon())
 			FD_SET(connectionList[i]->getSockId(), except_fds);
 
 	return 0;
@@ -379,9 +396,9 @@ void WIN_SOCKET::sockClose() {
 	int n = connectionList.size();
 	std::cout << "[" << getSockId() << "] CLOSING" << std::endl;
 	closesocket(sockId);
-	sockId = NO_SOCKET;
+	connectFlag = false;
 	for (i = 0; i < n; ++i)
-		if (connectionList[i]->getSockId() != NO_SOCKET)
+		if (connectionList[i]->activeCon())
 			connectionList[i]->sockClose();
 	if (CBmap.find("close") != CBmap.end())
 		CBmap["close"](this);
@@ -469,35 +486,36 @@ void WIN_SOCKET::getHostName(std::string &hostname_, std::string &service_) {
 	WSACleanup();
 }
 
+bool WIN_SOCKET::activeCon() {
+	return connectFlag;
+}
+
 void WIN_SOCKET::commandSrvStr(std::string str) {
 	std::string cmdDivider = "||";
 	std::string argDivider = "##";
 	size_t cmdDividerSize = cmdDivider.length();
-	size_t argDividerSize = argDivider.length();
 	std::size_t pos = str.find(cmdDivider);
 	if (pos != std::string::npos) {
 		std::string cmd = str.substr(0, pos);
 		std::string data = str.substr(pos + cmdDividerSize);
+		std::vector<std::string>* argList = StringHelper::split(data,
+				argDivider);
 		std::cout << "[" << getSockId() << "] CMD = " << cmd << " DATA = "
 				<< data << std::endl;
-		if (cmd == "send") {
-			sockSend(data);
+		if (cmd == "sendc") {
+			// send client
+			sockSend((*argList)[1], std::stoi((*argList)[0]));
+		} else if (cmd == "sends") {
+			// send server
+			sockSend((*argList)[0]);
+		} else if (cmd == "senda") {
+			// broadcast
+			sockSendAll((*argList)[0]);
 		}
 	}
 }
 
 void WIN_SOCKET::commandClientStr(std::string str) {
-	std::string divSequence = "||";
-	size_t divSequenceSize = divSequence.length();
-	std::size_t pos = str.find(divSequence);
-	if (pos != std::string::npos) {
-		std::string cmd = str.substr(0, pos);
-		std::string data = str.substr(pos + divSequenceSize);
-		std::cout << "[" << getSockId() << "] CMD = " << cmd << " DATA = "
-				<< data << std::endl;
-		if (cmd == "send") {
-			sockSend(data);
-		}
-	}
+	commandSrvStr(str);
 }
 #endif

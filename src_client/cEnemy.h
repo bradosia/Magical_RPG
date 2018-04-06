@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cBicho.h"
-#include "cPlayer1.h"
+#include "cActor.h"
 
 class cEnemy: public cBicho
 {

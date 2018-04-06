@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cBicho.h"
+#include "cFireball.h"
+#include "cArrow.h"
 
 #define CHARGE_BREAK   30
 #define COOLDOWN		6 //frames de espera minima entre ataque y ataque
@@ -20,10 +22,16 @@
 #define STATE_SKILLWALKDOWN	 25
 #define STATE_SKILLWALKLEFT	 26
 
-class cPlayer: public cBicho {
+class cActor: public cBicho {
+private:
+	int max_SP, SP, charge, cooldown, frame_walk_delay, frame_attack_delay,
+			frame_texture_tiles, //the number in texture tiles that occupies the side of a frame of the sprite
+			step_length, //TILE_SIZE has to be multiple of step_length
+			logic_state,
+			teamNumber; // same team numbers can't hurt each other
 public:
-	cPlayer();
-	~cPlayer();
+	cActor();
+	~cActor();
 
 	void DrawRect(int tex_id, float xo, float yo, float xf, float yf);
 	void NextFrame(int max);  // max es el total de frames de la animacion
@@ -70,12 +78,19 @@ public:
 
 	void SetCooldown(int c);
 	int GetCooldown();
-	void setTest(int test_);
-	int getTest();
 
-private:
-	int max_SP, SP, charge, cooldown, frame_walk_delay, frame_attack_delay,
-			frame_texture_tiles, //el numero en tiles de textura que ocupa el lado de un frame del sprite
-			step_length; //TILE_SIZE ha de ser multiplo de step_length
-	int test = 0;
+	/* ported */
+	void Draw(int tex_id, int tex_w, int tex_h, bool run);
+
+	bool Attack(cBicho* enemy);
+
+	void SetShieldState(int render_state);
+
+	void StopP1();
+	void StopDoingSkillP1();
+
+	void TestShieldProtection(int attack_state, int damage, int x, int y);
+
+	void SetLogicState(int input_state);
+	int GetLogicState();
 };

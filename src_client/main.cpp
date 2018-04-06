@@ -26,18 +26,21 @@
 #include <assert.h>
 #endif
 
-#include "../src_shared/stdin_thread.h"
-#include "../src_shared/U_SOCKET.h"
+#include "../src_shared/asyncConsole/asyncConsole.h"
+#include "../src_shared/xSock/xSock.h"
+#include "../src_shared/json.hpp"
 #include "globals.h"
 #include "cGame.h"
 
-void clientConnect(U_SOCKET_client* socketClient);
+void clientConnect(xSockClient* socketClient);
 /* callbacks */
-void closeCB(U_SOCKET_client* socketClient);
-void connectCB(U_SOCKET_client* socketClient);
-void dataCB(U_SOCKET_client* socketClient);
-void endCB(U_SOCKET_client* socketClient);
-void errorCB(U_SOCKET_client* socketClient);
+void closeCB(xSockClient* socketClient);
+void connectCB(xSockClient* socketClient);
+void dataCB(xSockClient* socketClient);
+void endCB(xSockClient* socketClient);
+void errorCB(xSockClient* socketClient);
+void gameLoopCB(cGame* gameObj, xSockClient* socketClient);
+void writeUpdateCB(xSockClient* socketClient);
 
 cGame Game;
 
@@ -68,15 +71,15 @@ void AppIdle() {
 }
 
 void init(int argc, char** argv) {
-	U_SOCKET_client* socketClient = new U_SOCKET_client();
+	xSockClient* socketClient = new xSockClient();
 
 	//XWIN::removeConsole(); // closing the openGL window wont close the main process
 	std::string projectName = "Magical RPG";
 	std::thread first(clientConnect, socketClient);
 	std::function<void(std::string)> CB = [&socketClient](std::string str)
 	{	socketClient->commandStr(str);};
-	std::thread second(stdinHandle::listen, CB);
-	stdinHandle::signalInit();
+	std::thread second(asyncConsole::listen, CB);
+	asyncConsole::signalInit();
 
 	int res_x, res_y, pos_x, pos_y;
 
@@ -144,42 +147,56 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 #endif
 
-void clientConnect(U_SOCKET_client* socketClient) {
+void clientConnect(xSockClient* socketClient) {
 	try {
 		socketClient->on("close",
-				std::function<void(U_SOCKET_client*)>(&closeCB));
+				std::function<void(xSockClient*)>(&closeCB));
 		socketClient->on("connect",
-				std::function<void(U_SOCKET_client*)>(&connectCB));
+				std::function<void(xSockClient*)>(&connectCB));
 		socketClient->on("data",
-				std::function<void(U_SOCKET_client*)>(&dataCB));
-		socketClient->on("end", std::function<void(U_SOCKET_client*)>(&endCB));
+				std::function<void(xSockClient*)>(&dataCB));
+		socketClient->on("end", std::function<void(xSockClient*)>(&endCB));
 		socketClient->on("error",
-				std::function<void(U_SOCKET_client*)>(&errorCB));
+				std::function<void(xSockClient*)>(&errorCB));
 		socketClient->connect(9573, "localhost"); // 16777343
 	} catch (const std::exception& e) {
 		std::cout << "Error: " << e.what() << std::endl;
 	}
 }
 
-void closeCB(U_SOCKET_client* socketClient) {
+void closeCB(xSockClient* socketClient) {
 	std::cout << "Client Closed" << std::endl;
 }
 
-void connectCB(U_SOCKET_client* socketClient) {
+void connectCB(xSockClient* socketClient) {
 	std::cout << "Player connected: " << socketClient->id() << std::endl;
+	Game.getActorMain()->SetTile(8, 5);
+	//Game.on("loopEnd", std::bind(&gameLoopCB, std::placeholders::_1, socketClient) );
 }
 
-void dataCB(U_SOCKET_client* socketClient) {
+void dataCB(xSockClient* socketClient) {
 	std::string msg = socketClient->msgLast();
 	std::cout << "Client: " << socketClient->id() << " Received Message: "
 			<< msg << std::endl;
-	//Game->updatePlayer(socketClient->id(),x,y,angle);
+	Game.getActorMain()->SetTile(8, 5);
 }
-void endCB(U_SOCKET_client* socketClient) {
+void endCB(xSockClient* socketClient) {
 	std::cout << "Server issued a disconnection" << std::endl;
 }
 
-void errorCB(U_SOCKET_client* socketClient) {
+void errorCB(xSockClient* socketClient) {
 	std::cout << "Player error: " << socketClient->id() << std::endl
 			<< socketClient->errorMsgLast() << std::endl;
+}
+
+void gameLoopCB(cGame* gameObj, xSockClient* socketClient) {
+	std::string gameStatus = "P@x:"
+			+ std::to_string(gameObj->getActorMain()->GetX()) + ",y:"
+			+ std::to_string(gameObj->getActorMain()->GetY());
+	socketClient->write(gameStatus,
+			std::function<void(xSockClient*)>(&writeUpdateCB));
+}
+
+void writeUpdateCB(xSockClient* socketClient) {
+
 }

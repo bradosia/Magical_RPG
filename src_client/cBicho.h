@@ -26,65 +26,64 @@
 
 #define STATE_DYING			0
 
-class cBicho
-{
+class cBicho {
 public:
 	cBicho(void);
 	virtual ~cBicho(void);
 
-	void SetPosition(int x,int y);
+	void SetPosition(int x, int y);
 	void SetX(int x);
-	int  GetX();
+	int GetX();
 	void SetY(int y);
-	int  GetY();
+	int GetY();
 	void SetBaseTilesHeight(int bth);
-	int  GetBaseHeight();
+	int GetBaseHeight();
 	void SetBaseTilesWidth(int btw);
-	int  GetBaseWidth();
+	int GetBaseWidth();
 	void SetHitHeight(int hh);
 	int GetHitHeight();
 	void SetHitWidth(int hw);
 	int GetHitWidth();
 
-
 	std::vector<int> GetTiles(); //nos devuelve las posiciones de las tiles con las que intersecta la base del cBicho  
 	cRect GetHitBox();
 	bool Intersection(cRect box1, cRect box2);
-	bool Intersection(cRect box1,int px,int py);
-	void SetTile(int tx,int ty);
+	bool Intersection(cRect box1, int px, int py);
+	void SetTile(int tx, int ty);
 
-	virtual void Draw(int tex_id,int tex_w,int tex_h,bool run) {}; //cuando llamemos a una funcion virtual se ejecutara la funcion del mismo nombre de la subclase correspondiente
+	virtual void Draw(int tex_id, int tex_w, int tex_h, bool run) {
+	}
+	; //cuando llamemos a una funcion virtual se ejecutara la funcion del mismo nombre de la subclase correspondiente
 
 	void Stop();
 
 	void StartAttack();
 
 	void SetState(int s);
-	int  GetState();
+	int GetState();
 
 	void SetFrame(int frame);
-	int  GetFrame();
+	int GetFrame();
 
 	void SetDelay(int d);
-	int  GetDelay();
+	int GetDelay();
 
 	bool IsLooking();
 	bool IsWalking();
 	bool IsAttacking();
 	bool IsDamaged();
-	
+
 	void SetMaxHealth(int max_h);
-	int  GetMaxHealth();
+	int GetMaxHealth();
 	void SetHealth(int health);
-	int  GetHealth();
+	int GetHealth();
 	void SetDamage(int damage);
-	int  GetDamage();
-	
+	int GetDamage();
+
 private:
-	int x,y, //el pixel inferior izquierdo de la hitbox del bicho
-		hit_w,hit_h, //dimensiones en pixeles de la parte golpeable de un frame del sprite, no es necesario que sean divisible por TILE_SIZE, pero en los sprites asociados la hitbox ha de estar en el centro/centro de cada frame 
-		base_tiles_w, base_tiles_h, //dimensiones en tiles de la base colisionable
-		state,
-		seq,delay, //seq es el frame de la sequencia de animacion que toca pintar ahora, delay es la espera de uno de esos frames a otro
-		max_health,health,damage;
+	int x, y, //el pixel inferior izquierdo de la hitbox del bicho
+			hit_w, hit_h, //dimensiones en pixeles de la parte golpeable de un frame del sprite, no es necesario que sean divisible por TILE_SIZE, pero en los sprites asociados la hitbox ha de estar en el centro/centro de cada frame
+			base_tiles_w, base_tiles_h, //dimensiones en tiles de la base colisionable
+			state, seq, delay, //seq es el frame de la sequencia de animacion que toca pintar ahora, delay es la espera de uno de esos frames a otro
+			max_health, health, damage;
 };

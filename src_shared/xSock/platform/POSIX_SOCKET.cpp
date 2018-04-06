@@ -8,7 +8,7 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "POSIX_SOCKET.h"
+#include "../platform/POSIX_SOCKET.h"
 #ifdef __linux__
 
 POSIX_SOCKET::POSIX_SOCKET(int port_)

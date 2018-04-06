@@ -8,7 +8,7 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "APPLE_HTTP.h"
+#include "../platform/APPLE_HTTP.h"
 #ifdef __APPLE__
 
 APPLE_HTTP::APPLE_HTTP()

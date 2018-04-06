@@ -27,47 +27,48 @@
 #endif
 /* threads end */
 
-#include "../src_shared/stdin_thread.h"
-#include "../src_shared/U_SOCKET.h"
+#include "../src_shared/asyncConsole/asyncConsole.h"
+#include "../src_shared/xSock/xSock.h"
+#include "../src_shared/json.hpp"
 #include "MR_logic.h"
 
-void serverListen(U_SOCKET* socketServer);
+void serverListen(xSock* socketServer);
 /* callbacks */
-void closeCB(U_SOCKET* socketServer);
-void connectionCB(U_SOCKET* socketServer);
-void errorCB(U_SOCKET* socketServer);
-void listeningCB(U_SOCKET* socketServer);
+void closeCB(xSock* socketServer);
+void connectionCB(xSock* socketServer);
+void errorCB(xSock* socketServer);
+void listeningCB(xSock* socketServer);
 
-void clientCloseCB(U_SOCKET_client* socketClient);
-void clientConnectCB(U_SOCKET_client* socketClient);
-void clientDataCB(U_SOCKET_client* socketClient);
-void clientErrorCB(U_SOCKET_client* socketClient);
+void clientCloseCB(xSockClient* socketClient);
+void clientConnectCB(xSockClient* socketClient);
+void clientDataCB(xSockClient* socketClient);
+void clientErrorCB(xSockClient* socketClient);
 
 // Magical RPG Logic
 MR_logic Game;
 
 int main() {
-	U_SOCKET* socketServer = new U_SOCKET();
+	xSock* socketServer = new xSock();
 
 	std::thread first(serverListen, socketServer);
 	std::function<void(std::string)> CB = [&socketServer](std::string str)
 	{	socketServer->commandStr(str);};
-	std::thread second(stdinHandle::listen, CB);
-	stdinHandle::signalInit();
+	std::thread second(asyncConsole::listen, CB);
+	asyncConsole::signalInit();
 	while (1) {
 		/* do timed events and scheduled send() here */
 	}
 	return 0;
 }
 
-void serverListen(U_SOCKET* socketServer) {
+void serverListen(xSock* socketServer) {
 	try {
-		socketServer->on("close", std::function<void(U_SOCKET*)>(&closeCB));
+		socketServer->on("close", std::function<void(xSock*)>(&closeCB));
 		socketServer->on("connection",
-				std::function<void(U_SOCKET*)>(&connectionCB));
-		socketServer->on("error", std::function<void(U_SOCKET*)>(&errorCB));
+				std::function<void(xSock*)>(&connectionCB));
+		socketServer->on("error", std::function<void(xSock*)>(&errorCB));
 		socketServer->on("listening",
-				std::function<void(U_SOCKET*)>(&listeningCB));
+				std::function<void(xSock*)>(&listeningCB));
 		socketServer->listen(9573, "localhost"); // 16777343
 		//socketServer->listen(9573, "127.0.0.1"); // 16777343
 		//socketServer->listen(80, "www.newgrounds.com");
@@ -76,49 +77,49 @@ void serverListen(U_SOCKET* socketServer) {
 	}
 }
 
-void closeCB(U_SOCKET* socketServer) {
+void closeCB(xSock* socketServer) {
 	std::cout << "Server Closed" << std::endl;
 }
 
-void connectionCB(U_SOCKET* socketServer) {
-	U_SOCKET_client* socketClient = socketServer->clientLast();
+void connectionCB(xSock* socketServer) {
+	xSockClient* socketClient = socketServer->clientLast();
 	std::cout << "Player Connected: " << socketClient->id() << std::endl;
 	//Game.newPlayer();
 
 	socketClient->on("close",
-			std::function<void(U_SOCKET_client*)>(&clientCloseCB));
+			std::function<void(xSockClient*)>(&clientCloseCB));
 	socketClient->on("connect",
-			std::function<void(U_SOCKET_client*)>(&clientConnectCB));
+			std::function<void(xSockClient*)>(&clientConnectCB));
 	socketClient->on("data",
-			std::function<void(U_SOCKET_client*)>(&clientDataCB));
+			std::function<void(xSockClient*)>(&clientDataCB));
 	socketClient->on("error",
-			std::function<void(U_SOCKET_client*)>(&clientErrorCB));
+			std::function<void(xSockClient*)>(&clientErrorCB));
 }
 
-void errorCB(U_SOCKET* socketServer) {
+void errorCB(xSock* socketServer) {
 	std::cout << socketServer->errorMsgLast() << std::endl;
 }
 
-void listeningCB(U_SOCKET* socketServer) {
-	U_SOCKET_addr* sockAddr = socketServer->address();
+void listeningCB(xSock* socketServer) {
+	xSock_addr* sockAddr = socketServer->address();
 	std::cout << "Listening on port: " << sockAddr->port << " address: "
 			<< sockAddr->address << std::endl;
 }
 
-void clientCloseCB(U_SOCKET_client* socketClient) {
+void clientCloseCB(xSockClient* socketClient) {
 	std::cout << "Player disconnected: " << socketClient->id() << std::endl;
 //Game->removePlayer(socketClient->id());
 }
-void clientConnectCB(U_SOCKET_client* socketClient) {
+void clientConnectCB(xSockClient* socketClient) {
 	std::cout << "Player connected!: " << socketClient->id() << std::endl;
 }
-void clientDataCB(U_SOCKET_client* socketClient) {
+void clientDataCB(xSockClient* socketClient) {
 	std::cout << "Player data: " << socketClient->id() << std::endl;
 	std::string msg = socketClient->msgLast();
 	std::cout << "Client: " << socketClient->id() << " Received Message: "
 			<< msg << std::endl;
 	//Game->updatePlayer(socketClient->id(),x,y,angle);
 }
-void clientErrorCB(U_SOCKET_client* socketClient) {
+void clientErrorCB(xSockClient* socketClient) {
 	std::cout << "Player error: " << socketClient->id() << std::endl;
 }

@@ -7,7 +7,7 @@
 #include <signal.h>
 #include <io.h>
 
-class stdinHandle {
+class asyncConsole {
 public:
 	static void listen(std::function<void(std::string)> CB);
 	static void signalCB(int sig_number);

@@ -8,7 +8,7 @@
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
 // Requires Cygwin in windows and GCC in linux
 //============================================================================
-#include "APPLE_SOCKET.h"
+#include "../platform/APPLE_SOCKET.h"
 #ifdef __APPLE__
 
 APPLE_SOCKET::APPLE_SOCKET(int port_)

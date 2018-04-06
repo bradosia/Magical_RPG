@@ -1,15 +1,15 @@
 //============================================================================
-// Name        : Ravioli Racing
-// Author      : Branden Lee
+// Name        : xSock
+// Author      : Brad Lee
 // Version     : 0.01
 // Copyright   : GPL
-// Description : C++ Racing Game
+// Description : Cross-platform Sockets for C++
 //
 // IDE: Eclipse Version: Neon.2 Release (4.6.2)
-// Requires Cygwin in windows and GCC in linux
+// Requires MinGW for windows, GCC for linux, and XCode for mac
 //============================================================================
-#ifndef U_HTTP_H
-#define U_HTTP_H
+#ifndef X_HTTP_H
+#define X_HTTP_H
 
 #include <cstring>       // strlen
 #include <iostream>
@@ -22,27 +22,27 @@
 #include <string.h>
 
 #if defined __linux__ || defined __CYGWIN__
-#include "POSIX_HTTP.h"
-#define UU_HTTP POSIX_HTTP
+#include "platform/POSIX_HTTP.h"
+#define P_HTTP POSIX_HTTP
 #elif defined _WIN32
-#include "WIN_HTTP.h"
-#define UU_HTTP WIN_HTTP
+#include "platform/WIN_HTTP.h"
+#define P_HTTP WIN_HTTP
 #elif defined __APPLE__
-#include "APPLE_HTTP.h"
-#define UU_HTTP APPLE_HTTP
+#include "platform/APPLE_HTTP.h"
+#define P_HTTP APPLE_HTTP
 #endif
 
 /**
- @class U_HTTP
+ @class xHTTP
  Uses libraries for a basic winsock application.
  A collection of HTTP methods.
  */
-class U_HTTP
+class xHTTP
 {
 private:
-	UU_HTTP *httpObjPtr;
+	P_HTTP *httpObjPtr;
 public:
-	U_HTTP();
+	xHTTP();
 	int socket_connect(char *host, int port);
 	std::string getWebsite(std::string url, std::string path);
 	std::string html(std::string response);

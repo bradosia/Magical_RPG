@@ -1,8 +1,12 @@
 #ifndef C_GAME_H
 #define C_GAME_H
 
-#include "cPlayer1.h"
-#include "cPlayer2.h"
+#include <unordered_map>
+#include <functional>
+
+#include "cActor.h"
+//#include "cPlayer1.h"
+//#include "cPlayer2.h"
 #include "cMonster1.h"
 #include "cMonster2.h"
 #include "cProjectile.h"
@@ -68,8 +72,35 @@
 #define P2_ATTACK	14
 #define P2_SKILL	15
 
-class cGame
-{
+class cGame {
+private:
+	std::vector<cActor*> actorList;
+	cActor* actorMain;
+
+	unsigned char keysNormal[256];
+	unsigned char keysSpecial[256];
+	unsigned char keys[256];
+	cRect visible_area;
+	int state, level;
+	bool p1_attacks, p2_attacks;
+	cScene Scene;
+	/*cActor1 Player1;
+	 cActor2 Player2;*/
+	cOverlay Overlay1;
+	//cOverlay Overlay2;
+	std::list<cBicho*> enemies;
+	std::list<cProjectile*> projectiles;
+	std::list<cToken*> tokens;
+	cData Data;
+	cSound Sound;
+	cShader Shader;
+	float time;
+	bool ia, epilepsia_mode;
+	std::unordered_map<std::string, std::function<void(cGame*)>> CBmap;
+
+	void UpdateCamera(int h1, int h2);
+	void UpdateCamera(int h1);
+	bool LoadDynamicLayer(int lvl);
 public:
 	cGame(void);
 	virtual ~cGame(void);
@@ -84,38 +115,17 @@ public:
 	void ReadMouse(int button, int state, int x, int y);
 	//Process
 	bool Process();
-	void Reshape(int w,int h);
+	void Reshape(int w, int h);
 	//Output
 	void Render();
 
-private:
-	unsigned char keysNormal[256];
-	unsigned char keysSpecial[256];
-	unsigned char keys[256];
-	cRect visible_area;
-	int state,level;
-	bool p1_attacks,p2_attacks;
-	cScene Scene;
-	cPlayer1 Player1;
-	cPlayer2 Player2;
-	cOverlay Overlay1;
-	cOverlay Overlay2;
-	std::list<cBicho*> enemies;
-	std::list<cProjectile*> projectiles;
-	std::list<cToken*> tokens;
-	cData Data;
-	cSound Sound;
-	cShader Shader;
-	float time;
-	bool ia, epilepsia_mode;
-
-	void UpdateCamera(int h1,int h2);
-	bool LoadDynamicLayer(int lvl);
+	cActor* getActorMain();
+	void on(std::string event, std::function<void(cGame*)> CB);
 };
 
 /*
-Debug: clic en barra izquierda derecha para añadir breakpoint, F11 para ejecutar linia a linia
-control + alt + Q y en expresion poner un objeto o this para "escuchar" sus variables
-*/
+ Debug: click on left bar to add breakpoint, F11 to execute line to line
+   control + alt + Q and in expression put an object or this to "listen" to its variables
+ */
 
 #endif

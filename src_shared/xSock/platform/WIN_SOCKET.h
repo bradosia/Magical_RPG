@@ -10,13 +10,14 @@
 //============================================================================
 #ifndef WIN_SOCKET_H
 #define WIN_SOCKET_H
+
 #ifdef _WIN32
 #define __USE_MINGW_ANSI_STDIO 0 // clears error: multiple definition of `vsnprintf'
 
 #include <cstring>       // strlen
 #include <iostream>
 #include <locale>
-#include <string>
+#include <string> // std::string, std::stoi
 #include <unordered_map>
 #include <stdio.h>
 #include <fstream>
@@ -24,6 +25,7 @@
 #include <functional>
 #include <chrono>
 #include <vector>
+#include "../platform/StringHelper.h"
 
 /* windows sock */
 #define _WIN32_WINNT 0x6000 // getaddrinfo and freeaddrinfo
@@ -61,7 +63,7 @@ private:
 	int sockId;
 	sockaddr_in sockAddr;
 	unsigned long sockAddrUn;
-	bool listenFlag;
+	bool listenFlag, connectFlag;
 	std::string host;
 	std::string hostName;
 	std::string sockFamily;
@@ -88,7 +90,6 @@ private:
 	void sockSrvListen();
 	int cmdRCV();
 	int sockSend();
-	void sockSend(std::string data);
 	/** Checks and handles socket connection
 	 @pre None
 	 @post None
@@ -127,9 +128,14 @@ public:
 	void setSockId(int sockId_);
 	void setSockAddr(sockaddr_in addr_);
 	void getHostName(std::string &hostname_, std::string &service_);
+	bool activeCon();
 	/* string commands */
 	void commandSrvStr(std::string str);
 	void commandClientStr(std::string str);
+	/* network */
+	void sockSend(std::string data);
+	void sockSend(std::string data, int client_);
+	void sockSendAll(std::string data);
 };
 
 #endif
