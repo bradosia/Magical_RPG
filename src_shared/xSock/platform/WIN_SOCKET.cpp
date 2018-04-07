@@ -137,7 +137,6 @@ void WIN_SOCKET::sockSrvListen() {
 	unsigned int elapsedTime = 0;
 	t1 = std::chrono::system_clock::now();
 	//also keep track of the amount of data sent as well
-	int bytesRead, bytesWritten = 0;
 	int nfds = sockId;
 	int i, n, activity;
 	if (CBmap.find("listening") != CBmap.end())
@@ -203,11 +202,12 @@ void WIN_SOCKET::sockSrvListen() {
 }
 
 int WIN_SOCKET::sockCon() {
+	int new_client_sock = 0;
 	if (FD_ISSET(sockId, &read_fds)) {
 		sockaddr_in client_addr;
 		memset(&client_addr, 0, sizeof(client_addr));
 		socklen_t client_len = sizeof(client_addr);
-		int new_client_sock = accept(sockId, (struct sockaddr *) &client_addr,
+		new_client_sock = accept(sockId, (struct sockaddr *) &client_addr,
 				&client_len);
 		if (new_client_sock < 0) {
 			throw std::runtime_error("Accept socket problem");
@@ -227,6 +227,7 @@ int WIN_SOCKET::sockCon() {
 		std::cout << "[" << getSockId() << "] HOST = " << hostname
 				<< " SERVICE = " << service << std::endl;
 	}
+	return new_client_sock;
 }
 
 int WIN_SOCKET::sockDcon() {

@@ -19,7 +19,6 @@
 #include <locale>
 #include <string> // std::string, std::stoi
 #include <unordered_map>
-#include <stdio.h>
 #include <fstream>
 #include <stdexcept>     // std::runtime_error
 #include <functional>
