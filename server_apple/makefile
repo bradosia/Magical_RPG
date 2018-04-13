@@ -8,7 +8,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src_shared/subdir.mk
+-include src_shared/xSock/platform/subdir.mk
+-include src_shared/xSock/subdir.mk
+-include src_shared/imgui/subdir.mk
+-include src_shared/asyncConsole/subdir.mk
 -include src_server/subdir.mk
 -include subdir.mk
 -include objects.mk

@@ -24,5 +24,8 @@ C_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src_server \
-src_shared \
+src_shared/asyncConsole \
+src_shared/imgui \
+src_shared/xSock/platform \
+src_shared/xSock \
 
