@@ -30,13 +30,13 @@
 #endif
 /* threads end */
 
-#include "../asyncConsole_src/asyncConsole.h"
-#include "../xSock_src/xSock.h"
+#include "../libs_src/asyncConsole/asyncConsole.h"
+#include "../libs_src/xSock/xSock.h"
 #include <json.hpp>
 
 #include "Globals.h"
-#include "../MR_logic_src/cLogicExt.h"
-#include "../MR_graphic_src/cGraphic.h"
+#include <MR_logic/cLogic.h>
+#include <MR_graphic/cGraphic.h>
 
 #include "imgui_impl_glfw_gl2.h"
 

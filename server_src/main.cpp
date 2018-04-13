@@ -27,10 +27,10 @@
 #endif
 /* threads end */
 
-#include "../asyncConsole_src/asyncConsole.h"
-#include "../xSock_src/xSock.h"
+#include <asyncConsole/asyncConsole.h>
+#include <xSock/xSock.h>
 #include <json.hpp>
-#include "../MR_logic_src/clogic.h"
+#include <MR_logic/cLogic.h>
 
 void serverListen(xSock* socketServer);
 /* callbacks */

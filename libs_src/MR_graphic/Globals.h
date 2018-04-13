@@ -16,7 +16,6 @@
 #include <list>
 #include <fstream>
 #include <string>
-#include "xwin.h"
 /* GLEW
  * The OpenGL Extension Wrangler Library
  */

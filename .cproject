@@ -31,6 +31,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.2140127155" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include/win32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libs_src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1349383164" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -70,12 +71,12 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="MR_graphic_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="MR_logic_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="asyncConsole_src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="client_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="imgui_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xSock_src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_graphic"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/imgui"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/xSock"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -111,6 +112,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.235018826" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;/${ProjName}/include/win32&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libs_src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1574711641" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -138,10 +140,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="MR_logic_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="asyncConsole_src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/xSock"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="server_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xSock_src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -187,6 +189,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1031912821" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;/${ProjName}/include/apple&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libs_src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.307945764" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -203,10 +206,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="MR_logic_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="asyncConsole_src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/xSock"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="server_src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xSock_src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -242,6 +245,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.284557676" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include/win32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libs_src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.181021775" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -309,6 +313,7 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.748113516" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include/win32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libs_src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.723228097" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -344,8 +349,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="imgui_src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="imgui_ui_test_src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/imgui"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
