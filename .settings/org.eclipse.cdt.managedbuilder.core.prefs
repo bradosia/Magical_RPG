@@ -31,6 +31,14 @@ environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.relea
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/C_INCLUDE_PATH/operation=remove
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/append=true
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/appendContributed=true
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/CPATH/delimiter=;
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/CPATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/CPLUS_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/CPLUS_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/C_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/append=true
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/appendContributed=true
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/CPATH/delimiter=;
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/CPATH/operation=remove
 environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/CPLUS_INCLUDE_PATH/delimiter=;
@@ -67,6 +75,10 @@ environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.relea
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/LIBRARY_PATH/operation=remove
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/append=true
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748/appendContributed=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/LIBRARY_PATH/delimiter=;
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/append=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380/appendContributed=true
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/LIBRARY_PATH/delimiter=;
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/LIBRARY_PATH/operation=remove
 environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522/append=true

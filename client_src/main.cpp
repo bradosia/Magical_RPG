@@ -19,10 +19,10 @@
 /* threads */
 #if defined _WIN32
 #undef _GLIBCXX_HAS_GTHREADS
-#include <mingw.thread.h>
+#include "../include/win32_mingw/mingw.thread.h"
 #include <mutex>
-#include <mingw.mutex.h>
-#include <mingw.condition_variable.h>
+#include "../include/win32_mingw/mingw.mutex.h"
+#include "../include/win32_mingw/mingw.condition_variable.h"
 #include <atomic>
 #include <assert.h>
 #else
@@ -32,7 +32,7 @@
 
 #include "../libs_src/asyncConsole/asyncConsole.h"
 #include "../libs_src/xSock/xSock.h"
-#include <json.hpp>
+#include "../include/win32_mingw/json.hpp"
 
 #include "Globals.h"
 #include <MR_logic/cLogic.h>

@@ -1,0 +1,18 @@
+"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\ucrt\x86"
+"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.16299.0\um\x86"
+"C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\release"
+
+libfbxsdk-mt
+
+
+undefined reference to `_aulldiv'
+undefined reference to `_allmul'
+undefined reference to `@__security_check_cookie@4'
+undefined reference to `_libm_sse2_sin_precise'
+undefined reference to `_libm_sse2_cos_precise'
+
+Mesh Loader
+https://github.com/assimp
+
+cmake -G "MinGW Makefiles" ..
+cmake -G "MinGW Makefiles"

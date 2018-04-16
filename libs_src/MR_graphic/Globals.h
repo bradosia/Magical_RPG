@@ -19,15 +19,15 @@
 /* GLEW
  * The OpenGL Extension Wrangler Library
  */
-#include <GL/glew.h>
+#include "../../include/win32_mingw/GL/glew.h"
 /* GLFW 3.2.1
  * Open Source, multi-platform library for OpenGL
  */
-#include <GLFW/glfw3.h>
+#include "../../include/win32_mingw/GLFW/glfw3.h"
 /* FBX Software Development Kit
  * Adaptable File Formats for 3D Animation Software | Autodesk
  */
-#include <fbxsdk.h>
+#include "../../include/win32_mingw/fbxsdk.h"
 /* ReactPhysics3D
  * Open-source physics engine
  */
@@ -39,12 +39,12 @@
 /* Corona
  * an image input/output library that can read, write, and manipulate image files
  */
-#include <corona.h>
+#include "../../include/win32_mingw/corona.h"
 /* LodePNG
  * PNG encoder and decoder in C and C++.
  */
-#include <lodepng/lodepng.h>
+#include "../../include/win32_mingw/lodepng/lodepng.h"
 /* BASS
  * an audio library for use in software on several platforms
  */
-#include <bass.h>
+#include "../../include/win32_mingw/bass.h"

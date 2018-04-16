@@ -1,0 +1,106 @@
+Info,  T30988: this is my info-call
+Info,  T30988: App fired!
+Info,  T30988: Load spider.obj
+Debug, T30988: Assimp 4.1.0 x86 gcc debug shared singlethreaded
+Info,  T30988: Found a matching importer for this file format: Wavefront Object Importer.
+Info,  T30988: Import root directory is '.\'
+Error, T30988: OBJ: Unable to locate material file spider.mtl
+Info,  T30988: OBJ: Opening fallback material file spider.mtl
+Error, T30988: OBJ: Unable to locate fallback material file spider.mtl
+Error, T30988: OBJ: failed to locate material HLeibTex, creating new material
+Error, T30988: OBJ: failed to locate material Skin, creating new material
+Error, T30988: OBJ: failed to locate material BeinTex, creating new material
+Error, T30988: OBJ: failed to locate material Augentex, creating new material
+Info,  T30988: Entering post processing pipeline
+Debug, T30988: RemoveRedundantMatsProcess begin
+Info,  T30988: RemoveRedundantMatsProcess finished. Removed 3 redundant and 1 unused materials.
+Debug, T30988: FindDegeneratesProcess begin
+Warn,  T30988: Found 14 degenerated primitives
+Skipping one or more lines with the same contents
+Debug, T30988: FindDegeneratesProcess finished
+Debug, T30988: GenUVCoordsProcess begin
+Debug, T30988: GenUVCoordsProcess finished
+Debug, T30988: TriangulateProcess begin
+Debug, T30988: TriangulateProcess finished. There was nothing to be done.
+Debug, T30988: SortByPTypeProcess begin
+Info,  T30988: Points: 4, Lines: 4, Triangles: 19, Polygons: 0 (Meshes, X = removed)
+Debug, T30988: SortByPTypeProcess finished
+Debug, T30988: FindInvalidDataProcess begin
+Error, T30988: FindInvalidDataProcess fails on mesh positions: All vectors are identical
+Error, T30988: Deleting mesh: Unable to continue without vertex positions
+Error, T30988: FindInvalidDataProcess fails on mesh positions: All vectors are identical
+Error, T30988: Deleting mesh: Unable to continue without vertex positions
+Error, T30988: FindInvalidDataProcess fails on mesh positions: All vectors are identical
+Error, T30988: Deleting mesh: Unable to continue without vertex positions
+Error, T30988: FindInvalidDataProcess fails on mesh positions: All vectors are identical
+Error, T30988: Deleting mesh: Unable to continue without vertex positions
+Info,  T30988: FindInvalidDataProcess finished. Found issues ...
+Debug, T30988: SplitLargeMeshesProcess_Triangle begin
+Debug, T30988: SplitLargeMeshesProcess_Triangle finished. There was nothing to do
+Debug, T30988: Generate spatially-sorted vertex cache
+Debug, T30988: GenVertexNormalsProcess begin
+Debug, T30988: GenVertexNormalsProcess finished. Normals are already there
+Debug, T30988: CalcTangentsProcess begin
+Info,  T30988: Tangents are undefined for line and point meshes
+Skipping one or more lines with the same contents
+Info,  T30988: CalcTangentsProcess finished. Tangents have been calculated
+Debug, T30988: JoinVerticesProcess begin
+Debug, T30988: Mesh 0 (HLeib01) | Verts in: 240 out: 71 | ~70.4167%
+Debug, T30988: Mesh 1 (OK) | Verts in: 180 out: 83 | ~53.8889%
+Debug, T30988: Mesh 2 (Bein1Li) | Verts in: 294 out: 111 | ~62.2449%
+Debug, T30988: Mesh 3 (Bein1Re) | Verts in: 294 out: 117 | ~60.2041%
+Debug, T30988: Mesh 4 (Bein2Li) | Verts in: 294 out: 113 | ~61.5646%
+Debug, T30988: Mesh 5 (Bein2Re) | Verts in: 294 out: 115 | ~60.8844%
+Debug, T30988: Mesh 6 (Bein3Re) | Verts in: 294 out: 107 | ~63.6054%
+Debug, T30988: Mesh 7 (Bein3Li) | Verts in: 294 out: 107 | ~63.6054%
+Debug, T30988: Mesh 8 (Bein4Re) | Verts in: 294 out: 113 | ~61.5646%
+Debug, T30988: Mesh 9 (Bein4Li) | Verts in: 294 out: 113 | ~61.5646%
+Debug, T30988: Mesh 10 (Zahn) | Verts in: 14 out: 9 | ~35.7143%
+Debug, T30988: Mesh 11 (Zahn) | Verts in: 84 out: 33 | ~60.7143%
+Debug, T30988: Mesh 12 (klZahn) | Verts in: 14 out: 9 | ~35.7143%
+Debug, T30988: Mesh 13 (klZahn) | Verts in: 84 out: 35 | ~58.3333%
+Debug, T30988: Mesh 14 (Kopf) | Verts in: 270 out: 79 | ~70.7407%
+Debug, T30988: Mesh 15 (Brust) | Verts in: 60 out: 17 | ~71.6667%
+Debug, T30988: Mesh 16 (Kopf2) | Verts in: 270 out: 79 | ~70.7407%
+Debug, T30988: Mesh 17 (Zahn2) | Verts in: 14 out: 9 | ~35.7143%
+Debug, T30988: Mesh 18 (Zahn2) | Verts in: 84 out: 33 | ~60.7143%
+Debug, T30988: Mesh 19 (klZahn2) | Verts in: 14 out: 9 | ~35.7143%
+Debug, T30988: Mesh 20 (klZahn2) | Verts in: 84 out: 35 | ~58.3333%
+Debug, T30988: Mesh 21 (Auge) | Verts in: 114 out: 36 | ~68.4211%
+Debug, T30988: Mesh 22 (Duplicate05) | Verts in: 114 out: 36 | ~68.4211%
+Info,  T30988: JoinVerticesProcess finished | Verts in: 3992 out: 1469 | ~63.2%
+Debug, T30988: SplitLargeMeshesProcess_Vertex begin
+Debug, T30988: SplitLargeMeshesProcess_Vertex finished. There was nothing to do
+Debug, T30988: LimitBoneWeightsProcess begin
+Debug, T30988: LimitBoneWeightsProcess end
+Debug, T30988: ImproveCacheLocalityProcess begin
+Debug, T30988: Mesh 0 | ACMR in: 1.237500 out: 0.937500 | ~24.2%
+Debug, T30988: Mesh 1 | ACMR in: 1.683333 out: 1.516667 | ~9.9%
+Debug, T30988: Mesh 2 | ACMR in: 1.602041 out: 1.295918 | ~19.1%
+Debug, T30988: Mesh 3 | ACMR in: 1.683674 out: 1.357143 | ~19.4%
+Debug, T30988: Mesh 4 | ACMR in: 1.622449 out: 1.316326 | ~18.9%
+Debug, T30988: Mesh 5 | ACMR in: 1.642857 out: 1.306122 | ~20.5%
+Debug, T30988: Mesh 6 | ACMR in: 1.561224 out: 1.224490 | ~21.6%
+Debug, T30988: Mesh 7 | ACMR in: 1.561224 out: 1.234694 | ~20.9%
+Debug, T30988: Mesh 8 | ACMR in: 1.622449 out: 1.295918 | ~20.1%
+Debug, T30988: Mesh 9 | ACMR in: 1.622449 out: 1.316326 | ~18.9%
+Error, T30988: This algorithm works on triangle meshes only
+Debug, T30988: Mesh 11 | ACMR in: 1.321429 out: 1.178571 | ~10.8%
+Error, T30988: This algorithm works on triangle meshes only
+Debug, T30988: Mesh 13 | ACMR in: 1.428571 out: 1.250000 | ~12.5%
+Debug, T30988: Mesh 14 | ACMR in: 1.433333 out: 1.011111 | ~29.5%
+Debug, T30988: Mesh 15 | ACMR in: 0.900000 out: 0.950000 | ~-5.6%
+Debug, T30988: Mesh 16 | ACMR in: 1.433333 out: 1.055556 | ~26.4%
+Error, T30988: This algorithm works on triangle meshes only
+Debug, T30988: Mesh 18 | ACMR in: 1.321429 out: 1.178571 | ~10.8%
+Error, T30988: This algorithm works on triangle meshes only
+Debug, T30988: Mesh 20 | ACMR in: 1.428571 out: 1.250000 | ~12.5%
+Debug, T30988: Mesh 21 | ACMR in: 1.289474 out: 1.000000 | ~22.4%
+Debug, T30988: Mesh 22 | ACMR in: 1.289474 out: 1.000000 | ~22.4%
+Info,  T30988: Cache relevant are 19 meshes (1312 faces). Average output ACMR is 1.217226
+Debug, T30988: ImproveCacheLocalityProcess finished. 
+Info,  T30988: Leaving post processing pipeline
+Info,  T30988: Import of scene spider.obj succeeded.
+Info,  T30988: =============== Post Import ====================
+Info,  T30988: drawing objects
+Skipping one or more lines with the same contents

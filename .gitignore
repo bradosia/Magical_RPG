@@ -1,4 +1,4 @@
 /ref/
-/libs/win32/libfbxsdk-mt.lib
-/libs/win64/libfbxsdk-mt.lib
-/audio_test/
+/libs/win32_mingw/libassimp.a
+/libs/win32_vs/libfbxsdk-mt.lib
+/libs/win64_vs/libfbxsdk-mt.lib

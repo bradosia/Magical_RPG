@@ -1,0 +1,2 @@
+C:\msys32\mingw32\bin\ar.exe qc ..\..\lib\libIrrXML.a  CMakeFiles/IrrXML.dir/irrXML.cpp.obj
+C:\msys32\mingw32\bin\ranlib.exe ..\..\lib\libIrrXML.a
