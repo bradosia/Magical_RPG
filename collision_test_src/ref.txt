@@ -1,0 +1,22 @@
+# advanced openGL matrices
+https://open.gl/depthstencils
+
+# basics on openGL matrices
+http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+
+#Mesh
+# for terrain
+https://github.com/DanielChappuis/reactphysics3d/blob/master/testbed/common/ConcaveMesh.h
+https://github.com/DanielChappuis/reactphysics3d/blob/master/testbed/common/ConcaveMesh.cpp
+# for models
+https://github.com/DanielChappuis/reactphysics3d/blob/master/testbed/common/ConvexMesh.h
+https://github.com/DanielChappuis/reactphysics3d/blob/master/testbed/common/ConvexMesh.cpp
+
+ReactPhysics3D
+http://www.reactphysics3d.com/documentation/api/html/classreactphysics3d_1_1_convex_mesh_shape.html
+
+aiMesh Struct Reference
+http://assimp.sourceforge.net/lib_html/structai_mesh.html
+
+#cmake
+cmake -G "MinGW Makefiles" ..
