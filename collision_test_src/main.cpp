@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include <iostream>
-#include <fstream>
+#include <fstream>      // std::ofstream
 
 //to map image filenames to textureIds
 #include <string.h>
@@ -277,6 +277,69 @@ int main() {
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB
 					| SOIL_FLAG_COMPRESS_TO_DXT);
+
+	int imgW[10] = { 0 };
+	int imgH[10] = { 0 };
+	int imgCH[10] = { 0 };
+	int imgWTemp, imgHTemp, imgCHTemp;
+	unsigned char** imgHeightMap = new unsigned char*[10];
+	unsigned char** imgMemblock = new unsigned char*[10];
+	unsigned int fileBytes[10] = { 0 };
+	unsigned int filePosition[10] = { 0 };
+	std::vector<std::string> imgFiles;
+	imgFiles.push_back("SpiderTex.jpg");
+	imgFiles.push_back("Gordunni_Ogre.jpg");
+	imgFiles.push_back("GoodShrekImage.png");
+	imgFiles.push_back("Gordunni_Ogre.jpg");
+	imgFiles.push_back("SpiderTex.jpg");
+	unsigned int i, n, uintSize, fileBytesTotal, spacingBytes;
+	spacingBytes = 10;
+	uintSize = sizeof(unsigned char);
+	n = imgFiles.size();
+	for (i = 0; i < n; i++) {
+		imgHeightMap[i] = SOIL_load_image(imgFiles.at(i).c_str(), &imgWTemp,
+				&imgHTemp, &imgCHTemp,
+				(imgFiles.at(i).find(".png") != std::string::npos) ?
+						SOIL_LOAD_RGBA : SOIL_LOAD_RGB);
+		imgW[i] = imgWTemp;
+		imgH[i] = imgHTemp;
+		imgCH[i] = imgCHTemp;
+		fileBytes[i] = imgW[i] * imgH[i] * imgCH[i] * uintSize;
+		fileBytesTotal += fileBytes[i];
+		if (i > 0)
+			filePosition[i] = filePosition[i - 1] + fileBytes[i - 1]
+					+ spacingBytes;
+		else
+			filePosition[i] = 0;
+	}
+
+	std::ofstream OutFile;
+	OutFile.open("assets.data", std::ios::out | std::ios::binary);
+	for (i = 0; i < n; i++) {
+		OutFile.write((char *) &imgHeightMap[i][0], fileBytes[i]);
+		OutFile.write("          ", spacingBytes);
+	}
+	OutFile.close();
+
+	std::ifstream InFile;
+	InFile.open("assets.data", std::ios::in | std::ios::binary);
+	if (InFile.is_open()) {
+		for (i = 0; i < n; i++) {
+			imgMemblock[i] = new unsigned char[fileBytes[i]];
+			InFile.seekg(filePosition[i]);
+			InFile.read((char *) &imgMemblock[i][0], fileBytes[i]);
+		}
+		InFile.close();
+	}
+
+	for (i = 0; i < n; i++) {
+		std::string outputFile = "";
+		outputFile += "output";
+		outputFile += std::to_string(i);
+		outputFile += ".bmp";
+		SOIL_save_image(outputFile.c_str(), SOIL_SAVE_TYPE_BMP, imgW[i],
+				imgH[i], imgCH[i], imgMemblock[i]);
+	}
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
