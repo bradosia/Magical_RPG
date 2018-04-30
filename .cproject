@@ -442,11 +442,7 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="server_apple">
-			<resource resourceType="PROJECT" workspacePath="/Magical_RPG"/>
-		</configuration>
 		<configuration configurationName="audio_test"/>
-		<configuration configurationName="client_win"/>
 		<configuration configurationName="client_test">
 			<resource resourceType="PROJECT" workspacePath="/Magical_RPG"/>
 		</configuration>
@@ -456,10 +452,19 @@
 		<configuration configurationName="Server">
 			<resource resourceType="PROJECT" workspacePath="/Ravioli_Racing"/>
 		</configuration>
-		<configuration configurationName="imgui_ui_test">
+		<configuration configurationName="ResourceFileLoader32">
 			<resource resourceType="PROJECT" workspacePath="/Magical_RPG"/>
 		</configuration>
 		<configuration configurationName="collision_test"/>
+		<configuration configurationName="server_win"/>
+		<configuration configurationName="server_apple">
+			<resource resourceType="PROJECT" workspacePath="/Magical_RPG"/>
+		</configuration>
+		<configuration configurationName="client_win"/>
+		<configuration configurationName="imgui_ui_test">
+			<resource resourceType="PROJECT" workspacePath="/Magical_RPG"/>
+		</configuration>
+		<configuration configurationName="ResourceFileLoader"/>
 		<configuration configurationName="Client">
 			<resource resourceType="PROJECT" workspacePath="/Ravioli_Racing"/>
 		</configuration>
@@ -469,12 +474,14 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/Ravioli_Racing"/>
 		</configuration>
-		<configuration configurationName="server_win"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.1213243870;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.1213243870.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1040494490;cdt.managedbuild.tool.gnu.c.compiler.input.476384498">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.816475149;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.816475149.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1204385674;cdt.managedbuild.tool.gnu.cpp.compiler.input.181021775">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
@@ -484,25 +491,46 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.816475149;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.816475149.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.867284941;cdt.managedbuild.tool.gnu.c.compiler.input.509893616">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1180487473;cdt.managedbuild.tool.gnu.cpp.compiler.input.512956484">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release.2030481182;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1841801842">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.;cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug.974536916;cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.1568141592">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1992121944;cdt.managedbuild.tool.gnu.c.compiler.input.1678670667">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.1213243870;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.1213243870.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.545436424;cdt.managedbuild.tool.gnu.cpp.compiler.input.1659353082">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1957375108;cdt.managedbuild.tool.gnu.c.compiler.input.1104395662">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1227711481;cdt.managedbuild.tool.gnu.c.compiler.input.1681223846">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1362114205;cdt.managedbuild.tool.gnu.c.compiler.input.404971539">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.176136433;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1287432593">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1815010897;cdt.managedbuild.tool.gnu.cpp.compiler.input.723228097">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1180487473;cdt.managedbuild.tool.gnu.cpp.compiler.input.512956484">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.1916263561;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.1916263561.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.909647421;cdt.managedbuild.tool.gnu.cpp.compiler.input.307945764">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1934800380.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1992121944;cdt.managedbuild.tool.gnu.c.compiler.input.1678670667">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.182949808;cdt.managedbuild.tool.gnu.c.compiler.input.484849335">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.;cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug.976223094;cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.1713237867">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1957375108;cdt.managedbuild.tool.gnu.c.compiler.input.1104395662">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1677131577.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1523996881;cdt.managedbuild.tool.gnu.cpp.compiler.input.956582054">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.1491034321;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.386250360">
@@ -514,13 +542,7 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1958110259;cdt.managedbuild.tool.gnu.cpp.compiler.input.1497298150">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1227711481;cdt.managedbuild.tool.gnu.c.compiler.input.1681223846">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.961012060;cdt.managedbuild.tool.gnu.cpp.compiler.input.1574711641">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1158056895.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1362114205;cdt.managedbuild.tool.gnu.c.compiler.input.404971539">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.343832757;cdt.managedbuild.tool.gnu.cpp.compiler.input.755801906">
@@ -532,13 +554,7 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.1217480748.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1175708298;cdt.managedbuild.tool.gnu.c.compiler.input.1522691528">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.176136433;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1287432593">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.1916263561;cdt.managedbuild.config.gnu.cygwin.exe.debug.197563710.206051171.1916263561.;cdt.managedbuild.tool.gnu.c.compiler.macosx.base.562514501;cdt.managedbuild.tool.gnu.c.compiler.input.1225707916">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522;cdt.managedbuild.config.gnu.cygwin.exe.release.230044016.345567522.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1815010897;cdt.managedbuild.tool.gnu.cpp.compiler.input.723228097">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>
