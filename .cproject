@@ -71,7 +71,6 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="client_src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_graphic"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
@@ -143,7 +142,6 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/xSock"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="server_src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -209,7 +207,6 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/MR_logic"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/asyncConsole"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/xSock"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="server_src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -277,7 +274,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="audio_test_src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -349,7 +346,6 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="imgui_ui_test_src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/imgui"/>
 					</sourceEntries>
 				</configuration>
@@ -429,7 +425,6 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="collision_test_src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libs_src/reactphysics3d"/>
 					</sourceEntries>
 				</configuration>
